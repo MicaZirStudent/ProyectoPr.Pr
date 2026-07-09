@@ -1,0 +1,154 @@
+/* Importamos las fuentes de Google */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto:wght@400;500&display=swap');
+
+/* Variables de colores del proyecto */
+:root {
+    --azul-medianoche: #0D1B2A;
+    --verde-sabio: #2D6A4F;
+    --arena: #F5F0E8;
+    --blanco: #ffffff;
+    --borde: #DDD8CE;
+    --gris-texto: #9CA3AF;
+}
+
+/* Fondo general de la página */
+.login-wrap {
+    min-height: 100vh;
+    background-color: var(--arena);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+    padding: 2rem;
+}
+
+/* Tarjeta central del login */
+.login-card {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--borde);
+}
+
+/* Área del logo */
+.login-logo-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Imagen del logo */
+.login-logo-img {
+    width: 180px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Título */
+.login-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--azul-medianoche);
+    text-align: center;
+    margin: 0 0 0.25rem;
+}
+
+/* Subtítulo */
+.login-subtitle {
+    font-size: 13px;
+    color: var(--gris-texto);
+    text-align: center;
+    margin: 0 0 1.75rem;
+}
+
+/* Mensaje de error */
+.login-error {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Cada campo del formulario */
+.login-field {
+    margin-bottom: 1rem;
+}
+
+/* Labels de los campos */
+.login-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--azul-medianoche);
+    margin-bottom: 5px;
+}
+
+/* Inputs del formulario */
+.login-field input {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--borde);
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: var(--azul-medianoche);
+    background: #FDFBF7;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+/* Efecto cuando el input está seleccionado */
+.login-field input:focus {
+    border-color: var(--verde-sabio);
+}
+
+/* Link de olvidaste tu contraseña */
+.login-forgot {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--verde-sabio);
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0.5rem 0 1.5rem;
+}
+
+.login-forgot:hover {
+    text-decoration: underline;
+}
+
+/* Botón de ingresar */
+.login-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--azul-medianoche);
+    color: var(--arena);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s;
+}
+
+.login-btn:hover {
+    background: var(--verde-sabio);
+}
+
+/* Texto del pie de página */
+.login-footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--gris-texto);
+    margin-top: 1.25rem;
+}
