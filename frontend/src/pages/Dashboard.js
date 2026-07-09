@@ -1,28 +1,52 @@
-// Importamos useNavigate para poder redirigir al usuario
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.jpg';
+import './Dashboard.css';
 
 const Dashboard = () => {
-
     const navigate = useNavigate();
-
-    // Recuperamos los datos del usuario que guardamos en localStorage al hacer login
     const usuario = JSON.parse(localStorage.getItem('usuario'));
 
-    // Función para cerrar sesión
     const cerrarSesion = () => {
-        // Borramos el token y los datos del usuario del localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
-
-        // Redirigimos al login
         navigate('/');
     };
 
     return (
-        <div>
-            <h1>Bienvenido, {usuario?.nombre} {usuario?.apellido}</h1>
-            <p>Rol: {usuario?.rol}</p>
-            <button onClick={cerrarSesion}>Cerrar sesión</button>
+        <div className="dashboard-wrap">
+            {/* Navbar */}
+            <nav className="dashboard-nav">
+                <img src={logo} alt="Solution logo" className="nav-logo" />
+                <div className="nav-info">
+                    <span className="nav-nombre">{usuario?.nombre} {usuario?.apellido}</span>
+                    <span className="nav-rol">{usuario?.rol}</span>
+                </div>
+                <button className="nav-btn-cerrar" onClick={cerrarSesion}>Cerrar sesión</button>
+            </nav>
+
+            {/* Contenido */}
+            <main className="dashboard-main">
+                <h1 className="dashboard-titulo">Bienvenido, {usuario?.nombre}!</h1>
+                <p className="dashboard-subtitulo">Seleccioná una opción para comenzar</p>
+
+                <div className="dashboard-cards">
+                    <div className="dash-card">
+                        <span className="dash-card-icono">🏠</span>
+                        <h2>Mis publicaciones</h2>
+                        <p>Gestioná tus propiedades activas y borradores</p>
+                    </div>
+                    <div className="dash-card">
+                        <span className="dash-card-icono">📋</span>
+                        <h2>Nueva publicación</h2>
+                        <p>Cargá una nueva propiedad al sistema</p>
+                    </div>
+                    <div className="dash-card">
+                        <span className="dash-card-icono">📅</span>
+                        <h2>Mis turnos</h2>
+                        <p>Revisá las visitas agendadas</p>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 };
