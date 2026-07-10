@@ -1,0 +1,174 @@
+/* Contenedor general */
+.mispub-wrap {
+    min-height: 100vh;
+    background-color: #F5F0E8;
+    font-family: 'Roboto', sans-serif;
+    padding: 2rem;
+}
+
+/* Header con título y botones */
+.mispub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* Título principal */
+.mispub-titulo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: #0D1B2A;
+    margin: 0 0 0.25rem;
+}
+
+/* Subtítulo */
+.mispub-subtitulo {
+    font-size: 13px;
+    color: #9CA3AF;
+    margin: 0;
+}
+
+/* Contenedor de botones del header */
+.mispub-acciones {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Botón volver */
+.btn-volver {
+    background: transparent;
+    border: 1.5px solid #0D1B2A;
+    color: #0D1B2A;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-volver:hover {
+    background: #0D1B2A;
+    color: #F5F0E8;
+}
+
+/* Botón nueva publicación */
+.btn-nueva {
+    background: #0D1B2A;
+    border: none;
+    color: #F5F0E8;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-nueva:hover {
+    background: #2D6A4F;
+}
+
+/* Mensaje cuando no hay publicaciones o está cargando */
+.mispub-mensaje {
+    text-align: center;
+    color: #9CA3AF;
+    font-size: 15px;
+    margin-top: 4rem;
+}
+
+/* Contenedor de la tabla */
+.mispub-tabla-wrap {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #DDD8CE;
+    overflow: hidden;
+}
+
+/* Tabla */
+.mispub-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Encabezados de la tabla */
+.mispub-tabla thead tr {
+    background: #0D1B2A;
+}
+
+.mispub-tabla th {
+    padding: 14px 16px;
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #F5F0E8;
+}
+
+/* Filas de la tabla */
+.mispub-tabla td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #0D1B2A;
+    border-bottom: 1px solid #DDD8CE;
+}
+
+.mispub-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mispub-tabla tbody tr:hover {
+    background: #FDFBF7;
+}
+
+/* Badge de estado */
+.estado-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #ffffff;
+    text-transform: capitalize;
+}
+
+/* Celda de acciones */
+.acciones-cell {
+    display: flex;
+    gap: 8px;
+}
+
+/* Botones de acción en la tabla */
+.btn-accion {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.btn-accion:hover {
+    opacity: 0.85;
+}
+
+.btn-accion.editar {
+    background: #F5F0E8;
+    color: #0D1B2A;
+    border: 1px solid #DDD8CE;
+}
+
+.btn-accion.enviar {
+    background: #2D6A4F;
+    color: #ffffff;
+}
+
+.btn-accion.ver {
+    background: #0D1B2A;
+    color: #ffffff;
+}

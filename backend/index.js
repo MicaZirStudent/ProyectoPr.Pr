@@ -12,6 +12,8 @@ const db = require('./src/config/db');
 
 // Importamos las rutas de autenticación (login y registro)
 const authRoutes = require('./src/routes/authRoutes');
+// Importamos las rutas de publicaciones
+const publicacionRoutes = require('./src/routes/publicacionRoutes');
 
 // Creamos la aplicación de Express
 const app = express();
@@ -25,6 +27,8 @@ app.use(express.json());
 // Le decimos a Express: todo lo que llegue a /api/auth, mandalo a authRoutes
 // Por eso el login termina quedando en /api/auth/login y el registro en /api/auth/registrar
 app.use('/api/auth', authRoutes);
+// Rutas de publicaciones (protegidas por token)
+app.use('/api/publicaciones', publicacionRoutes);
 
 // Ruta de prueba: si entramos a localhost:3001/ vemos este mensaje
 app.get('/', (req, res) => {

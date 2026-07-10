@@ -1,0 +1,196 @@
+/* Importamos las fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto:wght@400;500&display=swap');
+
+/* Contenedor general */
+.crear-wrap {
+    min-height: 100vh;
+    background-color: #F5F0E8;
+    font-family: 'Roboto', sans-serif;
+    padding: 2rem;
+}
+
+/* Header con título y botón volver */
+.crear-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* Título principal */
+.crear-titulo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    color: #0D1B2A;
+    margin: 0 0 0.25rem;
+}
+
+/* Subtítulo */
+.crear-subtitulo {
+    font-size: 13px;
+    color: #9CA3AF;
+    margin: 0;
+}
+
+/* Botón volver */
+.btn-volver {
+    background: transparent;
+    border: 1.5px solid #0D1B2A;
+    color: #0D1B2A;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-volver:hover {
+    background: #0D1B2A;
+    color: #F5F0E8;
+}
+
+/* Formulario */
+.crear-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Mensaje de error */
+.crear-error {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Mensaje de éxito */
+.crear-exito {
+    background-color: #D1FAE5;
+    color: #065F46;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Sección del formulario */
+.crear-seccion {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #DDD8CE;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Título de cada sección */
+.crear-seccion-titulo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #0D1B2A;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #DDD8CE;
+}
+
+/* Campo individual */
+.crear-field {
+    margin-bottom: 1.25rem;
+    flex: 1;
+}
+
+/* Label */
+.crear-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0D1B2A;
+    margin-bottom: 5px;
+}
+
+/* Inputs */
+.crear-field input,
+.crear-field textarea,
+.crear-field select {
+    width: 100%;
+    border: 1.5px solid #DDD8CE;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: #0D1B2A;
+    background: #FDFBF7;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.crear-field input:focus,
+.crear-field textarea:focus,
+.crear-field select:focus {
+    border-color: #2D6A4F;
+}
+
+/* Textarea */
+.crear-field textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Fila de dos campos lado a lado */
+.crear-fila {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Botones del formulario */
+.crear-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Botón cancelar */
+.btn-cancelar {
+    background: transparent;
+    border: 1.5px solid #DDD8CE;
+    color: #9CA3AF;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+    border-color: #0D1B2A;
+    color: #0D1B2A;
+}
+
+/* Botón guardar */
+.btn-guardar {
+    background: #0D1B2A;
+    border: none;
+    color: #F5F0E8;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-guardar:hover {
+    background: #2D6A4F;
+}
+
+.btn-guardar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
