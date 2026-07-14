@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import MisPublicaciones from './pages/MisPublicaciones';
 import CrearPublicacion from './pages/CrearPublicacion';
+import EditarPublicacion from './pages/EditarPublicacion';
 
 const App = () => {
     return (
@@ -22,6 +23,9 @@ const App = () => {
 
                 {/* Crear publicación */}
                 <Route path="/crear-publicacion" element={<CrearPublicacion />} />
+
+                {/* Editar publicación — el :id es dinámico, cambia según la publicación */}
+                <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
             </Routes>
         </BrowserRouter>
     );

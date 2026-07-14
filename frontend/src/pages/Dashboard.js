@@ -30,14 +30,14 @@ const Dashboard = () => {
                 <p className="dashboard-subtitulo">Seleccioná una opción para comenzar</p>
 
                 <div className="dashboard-cards">
-                    <div className="dash-card">
-                        <span className="dash-card-icono">🏠</span>
-                        <h2>Mis publicaciones</h2>
-                        <p>Gestioná tus propiedades activas y borradores</p>
-                    </div>
                     <div className="dash-card" onClick={() => navigate('/mis-publicaciones')}>
                         <span className="dash-card-icono">🏠</span>
                         <h2>Mis publicaciones</h2>
+                        <p>Editá y gestioná tus propiedades activas y borradores</p>
+                    </div>
+                    <div className="dash-card" onClick={() => navigate('/crear-publicacion')}>
+                        <span className="dash-card-icono">➕</span>
+                        <h2>Agregar nueva propiedad</h2>
                         <p>Cargá una nueva propiedad al sistema</p>
                     </div>
                     <div className="dash-card">

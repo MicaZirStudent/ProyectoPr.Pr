@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 // Importamos las funciones del controller
-const { crearPublicacion, obtenerMisPublicaciones, obtenerPublicacionPorId, editarPublicacion } = require('../controllers/publicacionController');
+const { crearPublicacion, obtenerMisPublicaciones, obtenerPublicacionPorId, editarPublicacion, enviarARevision } = require('../controllers/publicacionController');
 
 // Importamos el middleware de autenticación
 const { verificarToken } = require('../middleware/authMiddleware');
@@ -21,6 +21,9 @@ router.post('/crear', verificarToken, crearPublicacion);
 
 // PUT /api/publicaciones/:id — edita una publicación existente
 router.put('/:id', verificarToken, editarPublicacion);
+
+// PATCH /api/publicaciones/:id/enviar-revision — cambia el estado a en_revision
+router.patch('/:id/enviar-revision', verificarToken, enviarARevision);
 
 // Exportamos el router
 module.exports = router;

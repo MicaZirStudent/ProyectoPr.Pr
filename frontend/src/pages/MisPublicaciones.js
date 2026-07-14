@@ -48,7 +48,23 @@ const MisPublicaciones = () => {
             setCargando(false);
         }
     };
+    // Función para enviar una publicación a revisión
+    const enviarARevision = async (idPublicacion) => {
+        try {
+            const token = localStorage.getItem('token');
 
+            await axios.patch(`http://localhost:3001/api/publicaciones/${idPublicacion}/enviar-revision`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // Recargamos la lista para que se actualice el estado
+            obtenerPublicaciones();
+
+        } catch (error) {
+            if (error.response?.status === 401) navigate('/');
+            alert('No se pudo enviar a revisión');
+        }
+    };
     // Función para el color del estado de la publicación
     const colorEstado = (estado) => {
         const colores = {
@@ -109,8 +125,8 @@ const MisPublicaciones = () => {
                                             <button className="btn-accion editar" onClick={() => navigate(`/editar-publicacion/${pub.idPublicacion}`)}>Editar</button>
                                         )}
                                         {pub.estadoPublicacion === 'borrador' && (
-                                            <button className="btn-accion enviar">Enviar a revisión</button>
-                                        )}
+    <button className="btn-accion enviar" onClick={() => enviarARevision(pub.idPublicacion)}>Enviar a revisión</button>
+)}
                                         {pub.estadoPublicacion === 'publicada' && (
                                             <button className="btn-accion ver">Ver</button>
                                         )}

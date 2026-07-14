@@ -148,5 +148,41 @@ const editarPublicacion = async (req, res) => {
         res.status(500).json({ mensaje: 'Error al editar la publicación', error: error.message });
     }
 };
+// Función para ENVIAR una publicación a revisión
+// Solo se puede enviar si está en estado borrador
+const enviarARevision = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const idUsuario = req.usuario.idUsuario;
+
+        // Verificamos que la publicación exista y le pertenezca al agente
+        const [publicaciones] = await db.query(
+            'SELECT * FROM publicacion WHERE idPublicacion = ? AND idUsuario = ?',
+            [id, idUsuario]
+        );
+
+        if (publicaciones.length === 0) {
+            return res.status(404).json({ mensaje: 'Publicación no encontrada' });
+        }
+
+        const publicacion = publicaciones[0];
+
+        // Solo se puede enviar a revisión si está en borrador
+        if (publicacion.estadoPublicacion !== 'borrador') {
+            return res.status(403).json({ mensaje: 'Solo se pueden enviar a revisión publicaciones en borrador' });
+        }
+
+        // Cambiamos el estado a en_revision
+        await db.query(
+            'UPDATE publicacion SET estadoPublicacion = ? WHERE idPublicacion = ?',
+            ['en_revision', id]
+        );
+
+        res.json({ mensaje: 'Publicación enviada a revisión correctamente' });
+
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al enviar a revisión', error: error.message });
+    }
+};
 // Exportamos las funciones
-module.exports = { crearPublicacion, obtenerMisPublicaciones, obtenerPublicacionPorId, editarPublicacion };
+module.exports = { crearPublicacion, obtenerMisPublicaciones, obtenerPublicacionPorId, editarPublicacion, enviarARevision };
