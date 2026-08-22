@@ -1,3 +1,5 @@
+const connectDB = require('./config/db');
+connectDB();
 // Importamos express, el framework que nos permite crear el servidor
 const express = require('express');
 
