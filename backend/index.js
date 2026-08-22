@@ -1,4 +1,6 @@
-const connectDB = require('./config/db');
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+const connectDB = require('./src/config/db');
 connectDB();
 // Importamos express, el framework que nos permite crear el servidor
 const express = require('express');
