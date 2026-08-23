@@ -127,6 +127,10 @@
 
 .sidebar-icon {
     width: 1.35rem;
+    height: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     font-size: 1rem;
 }

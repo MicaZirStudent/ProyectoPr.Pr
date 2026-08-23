@@ -2,6 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import PublicacionMediaFields from '../components/PublicacionMediaFields';
+import { persistPublicacionMedia } from '../utils/publicacionMedia';
 import './CrearPublicacion.css';
 
 const CrearPublicacion = () => {
@@ -12,7 +14,9 @@ const CrearPublicacion = () => {
         precio: '',
         direccion: '',
         superficie: '',
-        ambientes: ''
+        ambientes: '',
+        documentos: [],
+        fotos: []
     });
     const [error, setError] = useState('');
     const [exito, setExito] = useState('');
@@ -23,6 +27,10 @@ const CrearPublicacion = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const handleMediaChange = (campo, valor) => {
+        setForm({ ...form, [campo]: valor });
+    };
+
     const handleGuardar = async (e) => {
         e.preventDefault();
         setError('');
@@ -31,11 +39,15 @@ const CrearPublicacion = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:3001/api/publicaciones/crear', form, {
+            const { documentos, fotos, ...payload } = form;
+            const respuesta = await axios.post('http://localhost:3001/api/publicaciones/crear', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
+            if (respuesta.data?.idPublicacion) {
+                await persistPublicacionMedia(respuesta.data.idPublicacion, documentos, fotos);
+            }
             setExito('Publicación guardada correctamente');
             setTimeout(() => {
                 navigate('/mis-publicaciones');
@@ -146,6 +158,12 @@ const CrearPublicacion = () => {
                         </div>
                     </div>
                 </div>
+
+                <PublicacionMediaFields
+                    documentos={form.documentos}
+                    fotos={form.fotos}
+                    onChange={handleMediaChange}
+                />
 
                 <div className="form-actions">
                     <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>

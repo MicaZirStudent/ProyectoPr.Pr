@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Brand from '../components/Brand';
+import { SquareIcon } from '../components/Icons';
 import './Login.css';
 
 const Login = () => {
@@ -28,9 +29,11 @@ const Login = () => {
     return (
         <div className="login-wrap">
             <section className="login-hero">
-                <Brand />
+                <span className="login-hero-mark" aria-hidden="true">
+                    <SquareIcon size={28} stroke={1.7} />
+                </span>
                 <div className="login-hero-copy">
-                    <h2>Gestión premium de propiedades</h2>
+                    <h2>Gestión de Propiedades</h2>
                     <p>Accedé al panel interno de SOLUTION para administrar publicaciones, revisiones y visitas.</p>
                 </div>
             </section>

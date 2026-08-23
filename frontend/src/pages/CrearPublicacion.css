@@ -1,3 +1,117 @@
 .crear-form {
     max-width: 760px;
 }
+
+.field-hint {
+    margin: -0.15rem 0 0.55rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.file-drop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    border: 1.5px dashed var(--borde);
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--navy);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.file-drop:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+}
+
+.file-drop input {
+    display: none;
+}
+
+.file-list {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.file-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: #f6f8fc;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+}
+
+.file-remove {
+    background: transparent;
+    border: none;
+    color: var(--gold-dark);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+
+.photo-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+}
+
+.photo-preview {
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--borde);
+    background: #f6f8fc;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-preview .file-remove {
+    width: 100%;
+    padding: 0.4rem;
+    background: #eef1f7;
+}
+
+.detalle-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.detalle-gallery img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid var(--borde);
+}
+
+.detalle-docs {
+    margin: 0 0 1.25rem;
+    padding-left: 1.1rem;
+    color: var(--muted);
+}
+
+.detalle-meta p {
+    margin: 0.35rem 0;
+    color: var(--muted);
+}

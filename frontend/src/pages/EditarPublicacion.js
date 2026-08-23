@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import PublicacionMediaFields from '../components/PublicacionMediaFields';
+import { getPublicacionMedia, persistPublicacionMedia } from '../utils/publicacionMedia';
 import './CrearPublicacion.css';
 
 const EditarPublicacion = () => {
@@ -13,7 +15,9 @@ const EditarPublicacion = () => {
         precio: '',
         direccion: '',
         superficie: '',
-        ambientes: ''
+        ambientes: '',
+        documentos: [],
+        fotos: []
     });
     const [error, setError] = useState('');
     const [exito, setExito] = useState('');

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import { BuildingIcon } from '../components/Icons';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -15,7 +16,9 @@ const Dashboard = () => {
 
             <div className="dashboard-cards">
                 <div className="dash-card" onClick={() => navigate('/mis-publicaciones')}>
-                    <span className="dash-card-icono">▣</span>
+                    <span className="dash-card-icono">
+                        <BuildingIcon size={22} />
+                    </span>
                     <h2>Mis publicaciones</h2>
                     <p>Editá y gestioná tus propiedades activas y borradores</p>
                 </div>

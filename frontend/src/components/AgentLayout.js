@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Brand from './Brand';
+import { BuildingIcon } from './Icons';
 import './AgentLayout.css';
 
 const NAV_ITEMS = [
     { path: '/dashboard', label: 'Inicio', icon: '⌂' },
-    { path: '/mis-publicaciones', label: 'Publicaciones', icon: '▣' },
+    { path: '/mis-publicaciones', label: 'Publicaciones', icon: <BuildingIcon size={18} /> },
     { path: '/crear-publicacion', label: 'Nueva propiedad', icon: '+' }
 ];
 
