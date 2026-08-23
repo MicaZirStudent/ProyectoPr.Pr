@@ -1,138 +1,142 @@
-# ProyectoPr.Pr — Sistema de Gestión Inmobiliaria
+# ProyectoPr.Pr — Sistema de Gestión Inmobiliaria SOLUTION
 
 Proyecto desarrollado por Micaela Zirafa, Elias Villanueva y Brisa Gutiérrez.
 Materia: Prácticas Profesionalizantes — 2026.
-
----
 
 ## Paso 1 — Instalar los programas necesarios
 
 Instalá todo en este orden:
 
 ### 1.1 Node.js
-Entrá a https://nodejs.org y descargá la versión LTS (el botón grande de la izquierda).
-Ejecutá el instalador y seguí siguiente, siguiente, finalizar sin cambiar nada.
-
-Para verificar que quedó bien instalado, abrí la terminal (cmd) y escribí:
+Entrá a https://nodejs.org y descargá la versión LTS.
+Para verificar:
 node -v
 npm -v
-Los dos tienen que mostrar un número de versión.
 
 ### 1.2 Git
 Entrá a https://git-scm.com/downloads y descargá la versión para Windows.
-Instalá con todas las opciones por defecto.
-
 Para verificar:
 git --version
 
-### 1.3 XAMPP
-Entrá a https://www.apachefriends.org/download.html y descargá la versión 8.0.30 (64 bit).
-Instalá con todas las opciones por defecto. Cuando pregunte dónde instalarlo, dejá C:\xampp.
+### 1.3 Cursor (IDE con IA)
+Entrá a https://cursor.com/download y descargá la versión para Windows.
+Al abrirlo por primera vez te ofrece importar la configuración de VS Code, aceptá.
 
----
+### 1.4 MongoDB Community Server
+Entrá a https://mongodb.com/try/download/community y descargá la versión para Windows.
+Durante la instalación:
+- Tildá Install MongoDB as a Service
+- Tildá Install MongoDB Compass (interfaz gráfica)
+
+Para verificar que el servicio está corriendo abrí MongoDB Compass
+y conectate a mongodb://localhost:27017
 
 ## Paso 2 — Configurar Git con tu identidad
 
-Abrí la terminal y escribí estos dos comandos con tus datos:
+Abrí la terminal y escribí estos comandos con tus datos del terciario:
 
 git config --global user.name "Tu Nombre"
-git config --global user.email "tu-mail-institucional@..."
-
----
+git config --global user.email "tuDNI@terciariourquiza.edu.ar"
 
 ## Paso 3 — Clonar el repositorio
-
-En la terminal escribí:
 
 git clone https://github.com/MicaZirStudent/ProyectoPr.Pr.git
 cd ProyectoPr.Pr
 
----
-
 ## Paso 4 — Instalar las dependencias
 
-### Frontend
+Frontend:
 cd frontend
 npm install
 cd ..
 
-### Backend
+Backend:
 cd backend
 npm install
 cd ..
 
----
-
 ## Paso 5 — Configurar la base de datos
 
-### 5.1 Levantar XAMPP
-Abrí el panel de XAMPP y dale Start a Apache y MySQL. Los dos tienen que ponerse en verde.
+### 5.1 Verificar que MongoDB está corriendo
+Abrí MongoDB Compass y conectate a mongodb://localhost:27017
+Si conecta, está todo bien.
 
-### 5.2 Crear la base de datos
-Abrí el navegador y entrá a http://localhost/phpmyadmin
-En el panel izquierdo tocá Nueva.
-En nombre de la base de datos escribí: gestion_inmobiliaria
-En cotejamiento elegí: utf8mb4_general_ci
-Tocá Crear.
+### 5.2 Crear el usuario administrador
+Dentro de la carpeta backend/ ejecutá:
 
-### 5.3 Importar las tablas
-Seleccioná la base de datos gestion_inmobiliaria en el panel izquierdo.
-Tocá la pestaña Importar arriba.
-Tocá Seleccionar archivo y buscá el archivo que está en la carpeta database/ del proyecto.
-Tocá Ejecutar. Tienen que aparecer todas las tablas creadas.
+node crearAdmin.js
 
----
+Esto crea el usuario administrador en la base de datos.
+Credenciales:
+- Email: admin@solution.com
+- Contraseña: admin123
+
+La base de datos solution se crea automáticamente.
 
 ## Paso 6 — Configurar el archivo .env
 
-Dentro de la carpeta backend/ vas a encontrar un archivo llamado .env.example.
-Copialo y renombralo como .env (sin el .example).
-Abrilo y completá con tus datos:
+Dentro de la carpeta backend/ copiá el archivo .env.example
+y renombralo como .env. Completá con estos datos:
 
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=gestion_inmobiliaria
+MONGO_URI=mongodb://localhost:27017/solution
 JWT_SECRET=una_clave_secreta_cualquiera
-
-La contraseña la dejás vacía si no le pusiste contraseña a MySQL en XAMPP, que es lo normal.
-El JWT_SECRET puede ser cualquier texto, por ejemplo: jwt_remax_2026
-
----
+PORT=3001
 
 ## Paso 7 — Levantar el proyecto
 
 Necesitás dos terminales abiertas al mismo tiempo.
 
-### Terminal 1 — Backend
+Terminal 1 — Backend:
 cd backend
-npm start
+node index.js
 
-### Terminal 2 — Frontend
+Tiene que aparecer:
+- MongoDB conectado correctamente
+- Servidor corriendo en http://localhost:3001
+
+Terminal 2 — Frontend:
 cd frontend
 npm start
 
 El navegador se abre solo en http://localhost:3000
 
----
+## Trazabilidad de commits
+
+Cada commit debe:
+- Realizarse con la cuenta del terciario (DNI@terciariourquiza.edu.ar)
+- Incluir el prompt utilizado en Cursor/IA
+- Incluir el link al ticket de Trello correspondiente
+
+Formato:
+git commit -m "TASK-XX Descripcion - Prompts: prompt usado - Ticket: link de trello"
+
+Tablero Trello: https://trello.com/b/5vqLCS8p/solution
 
 ## División del trabajo
 
-- Micaela — CU 1 al 4 (Acceso y Publicaciones)
-- ?? — CU 5 al 8 (Legal y Búsqueda pública)
-- ?? — CU 9 al 12 (Turnos y Administración)
-
----
+- Micaela Zirafa — CU-01 al CU-04 (Acceso y Publicaciones)
+- Brisa Gutierrez — CU-05 al CU-08 (Legal y Búsqueda pública)
+- Elias Villanueva — CU-09 al CU-12 (Turnos y Administración)
 
 ## Estructura del proyecto
 
 ProyectoPr.Pr/
-├── frontend/         # React — interfaz de usuario
+├── frontend/          # React — interfaz de usuario
 │   └── src/
-├── backend/          # Node.js — servidor y API
+├── backend/           # Node.js/Express — servidor y API
+│   ├── models/        # Modelos de Mongoose (MongoDB)
 │   └── src/
 │       ├── controllers/
 │       ├── routes/
 │       ├── middleware/
 │       └── config/
-└── database/         # Archivo SQL para importar en phpMyAdmin
+
+## Stack tecnológico
+
+- Frontend: React
+- Backend: Node.js + Express
+- Base de datos: MongoDB + Mongoose
+- IDE: Cursor (con IA integrada)
+- Control de versiones: GitHub
+- Gestión de tareas: Trello
+- IA utilizada: Claude (Anthropic) + Cursor Grok
