@@ -1,21 +1,12 @@
-// Importamos useState para manejar los campos del formulario
 import { useState } from 'react';
-
-// Importamos axios para hablarle al backend
 import axios from 'axios';
-
-// Importamos useNavigate para redirigir después del login
 import { useNavigate } from 'react-router-dom';
-
-// Importamos el logo
-import logo from '../assets/logo.jpg';
-
-// Importamos los estilos
+import Brand from '../components/Brand';
 import './Login.css';
 
 const Login = () => {
     const [correo, setCorreo] = useState('');
-    const [contrasena, setContrasena] = useState('');
+    const [contraseña, setContraseña] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -23,8 +14,8 @@ const Login = () => {
         e.preventDefault();
         try {
             const respuesta = await axios.post('http://localhost:3001/api/auth/login', {
-                correoElectronico: correo,
-                contrasena: contrasena
+                email: correo,
+                password: contraseña
             });
             localStorage.setItem('token', respuesta.data.token);
             localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario));
@@ -36,39 +27,47 @@ const Login = () => {
 
     return (
         <div className="login-wrap">
-            <div className="login-card">
-                <div className="login-logo-area">
-                    <img src={logo} alt="Solution logo" className="login-logo-img" />
+            <section className="login-hero">
+                <Brand />
+                <div className="login-hero-copy">
+                    <h2>Gestión premium de propiedades</h2>
+                    <p>Accedé al panel interno de SOLUTION para administrar publicaciones, revisiones y visitas.</p>
                 </div>
-                <h1 className="login-title">Iniciar sesión</h1>
-                <p className="login-subtitle">Ingresá con tu cuenta institucional</p>
-                {error && <p className="login-error">{error}</p>}
-                <form onSubmit={handleLogin}>
-                    <div className="login-field">
-                        <label>Correo electrónico</label>
-                        <input
-                            type="email"
-                            value={correo}
-                            onChange={(e) => setCorreo(e.target.value)}
-                            placeholder="nombre@solution.com"
-                            required
-                        />
-                    </div>
-                    <div className="login-field">
-                        <label>Contraseña</label>
-                        <input
-                            type="password"
-                            value={contrasena}
-                            onChange={(e) => setContrasena(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                        />
-                    </div>
-                    <a className="login-forgot" href="/recuperar">¿Olvidaste tu contraseña?</a>
-                    <button type="submit" className="login-btn">Ingresar</button>
-                </form>
-                <p className="login-footer">Sistema de gestión inmobiliaria — uso interno</p>
-            </div>
+            </section>
+
+            <section className="login-panel">
+                <div className="login-card">
+                    <Brand compact />
+                    <h1 className="login-title">Iniciar sesión</h1>
+                    <p className="login-subtitle">Ingresá con tu cuenta institucional</p>
+                    {error && <p className="alert alert-error">{error}</p>}
+                    <form onSubmit={handleLogin}>
+                        <div className="field">
+                            <label>Correo electrónico</label>
+                            <input
+                                type="email"
+                                value={correo}
+                                onChange={(e) => setCorreo(e.target.value)}
+                                placeholder="nombre@solution.com"
+                                required
+                            />
+                        </div>
+                        <div className="field">
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                value={contraseña}
+                                onChange={(e) => setContraseña(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+                        <a className="login-forgot" href="/recuperar">¿Olvidaste tu contraseña?</a>
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar</button>
+                    </form>
+                    <p className="login-footer">Sistema de gestión inmobiliaria — uso interno</p>
+                </div>
+            </section>
         </div>
     );
 };

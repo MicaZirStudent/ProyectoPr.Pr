@@ -1,18 +1,10 @@
-// Importamos useState para manejar los campos del formulario
 import { useState } from 'react';
-
-// Importamos axios para hablarle al backend
 import axios from 'axios';
-
-// Importamos useNavigate para redirigir después de guardar
 import { useNavigate } from 'react-router-dom';
-
-// Importamos los estilos
+import AgentLayout from '../components/AgentLayout';
 import './CrearPublicacion.css';
 
 const CrearPublicacion = () => {
-
-    // Estado para cada campo del formulario
     const [form, setForm] = useState({
         titulo: '',
         descripcion: '',
@@ -22,23 +14,15 @@ const CrearPublicacion = () => {
         superficie: '',
         ambientes: ''
     });
-
-    // Estado para mensajes de error o éxito
     const [error, setError] = useState('');
     const [exito, setExito] = useState('');
-
-    // Estado para saber si está guardando (deshabilitar el botón mientras espera)
     const [guardando, setGuardando] = useState(false);
-
     const navigate = useNavigate();
 
-    // Función genérica para actualizar cualquier campo del formulario
-    // En vez de hacer un handler por cada campo, usamos el name del input
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // Función que se ejecuta al presionar "Guardar Borrador"
     const handleGuardar = async (e) => {
         e.preventDefault();
         setError('');
@@ -47,20 +31,15 @@ const CrearPublicacion = () => {
 
         try {
             const token = localStorage.getItem('token');
-
             await axios.post('http://localhost:3001/api/publicaciones/crear', form, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-
             setExito('Publicación guardada correctamente');
-
-            // Esperamos 1.5 segundos y redirigimos a mis publicaciones
             setTimeout(() => {
                 navigate('/mis-publicaciones');
             }, 1500);
-
         } catch (error) {
             if (error.response?.status === 401) {
                 navigate('/');
@@ -72,26 +51,23 @@ const CrearPublicacion = () => {
     };
 
     return (
-        <div className="crear-wrap">
-            <div className="crear-header">
-                <div>
-                    <h1 className="crear-titulo">Nueva Publicación</h1>
-                    <p className="crear-subtitulo">Completá los datos de la propiedad</p>
-                </div>
-                <button className="btn-volver" onClick={() => navigate('/mis-publicaciones')}>← Volver</button>
-            </div>
-
+        <AgentLayout
+            title="Nueva publicación"
+            subtitle="Completá los datos de la propiedad"
+            actions={
+                <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
+                    ← Volver
+                </button>
+            }
+        >
             <form onSubmit={handleGuardar} className="crear-form">
+                {error && <p className="alert alert-error">{error}</p>}
+                {exito && <p className="alert alert-ok">{exito}</p>}
 
-                {/* Mensajes de error o éxito */}
-                {error && <p className="crear-error">{error}</p>}
-                {exito && <p className="crear-exito">{exito}</p>}
+                <div className="form-card">
+                    <h2 className="form-section-title">Datos de la propiedad</h2>
 
-                {/* Sección datos públicos */}
-                <div className="crear-seccion">
-                    <h2 className="crear-seccion-titulo">Datos de la propiedad</h2>
-
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Título *</label>
                         <input
                             type="text"
@@ -103,7 +79,7 @@ const CrearPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Descripción</label>
                         <textarea
                             name="descripcion"
@@ -114,15 +90,15 @@ const CrearPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-fila">
-                        <div className="crear-field">
+                    <div className="field-row">
+                        <div className="field">
                             <label>Tipo de operación *</label>
                             <select name="tipoOperacion" value={form.tipoOperacion} onChange={handleChange}>
                                 <option value="venta">Venta</option>
                                 <option value="alquiler">Alquiler</option>
                             </select>
                         </div>
-                        <div className="crear-field">
+                        <div className="field">
                             <label>Precio *</label>
                             <input
                                 type="number"
@@ -135,7 +111,7 @@ const CrearPublicacion = () => {
                         </div>
                     </div>
 
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Dirección *</label>
                         <input
                             type="text"
@@ -147,8 +123,8 @@ const CrearPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-fila">
-                        <div className="crear-field">
+                    <div className="field-row">
+                        <div className="field">
                             <label>Superficie (m²)</label>
                             <input
                                 type="number"
@@ -158,7 +134,7 @@ const CrearPublicacion = () => {
                                 placeholder="Ej: 200"
                             />
                         </div>
-                        <div className="crear-field">
+                        <div className="field">
                             <label>Ambientes</label>
                             <input
                                 type="number"
@@ -171,18 +147,16 @@ const CrearPublicacion = () => {
                     </div>
                 </div>
 
-                {/* Botones */}
-                <div className="crear-botones">
-                    <button type="button" className="btn-cancelar" onClick={() => navigate('/mis-publicaciones')}>
+                <div className="form-actions">
+                    <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
                         Cancelar
                     </button>
-                    <button type="submit" className="btn-guardar" disabled={guardando}>
-                        {guardando ? 'Guardando...' : 'Guardar Borrador'}
+                    <button type="submit" className="btn btn-primary" disabled={guardando}>
+                        {guardando ? 'Guardando...' : 'Guardar borrador'}
                     </button>
                 </div>
-
             </form>
-        </div>
+        </AgentLayout>
     );
 };
 

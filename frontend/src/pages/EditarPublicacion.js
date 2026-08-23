@@ -1,22 +1,11 @@
-// Importamos hooks de React
 import { useState, useEffect } from 'react';
-
-// Importamos axios para hablarle al backend
 import axios from 'axios';
-
-// Importamos useNavigate y useParams
-// useParams nos permite leer el id de la URL, por ejemplo /editar-publicacion/1
 import { useNavigate, useParams } from 'react-router-dom';
-
-// Importamos los estilos (reutilizamos el CSS de CrearPublicacion)
+import AgentLayout from '../components/AgentLayout';
 import './CrearPublicacion.css';
 
 const EditarPublicacion = () => {
-
-    // Leemos el id de la publicación desde la URL
     const { id } = useParams();
-
-    // Estado del formulario, arranca vacío y se llena cuando cargamos los datos
     const [form, setForm] = useState({
         titulo: '',
         descripcion: '',
@@ -26,16 +15,12 @@ const EditarPublicacion = () => {
         superficie: '',
         ambientes: ''
     });
-
-    // Estados para mensajes y loading
     const [error, setError] = useState('');
     const [exito, setExito] = useState('');
     const [guardando, setGuardando] = useState(false);
     const [cargando, setCargando] = useState(true);
-
     const navigate = useNavigate();
 
-    // Cuando el componente carga, traemos los datos actuales de la publicación
     useEffect(() => {
         obtenerPublicacion();
     }, []);
@@ -43,14 +28,10 @@ const EditarPublicacion = () => {
     const obtenerPublicacion = async () => {
         try {
             const token = localStorage.getItem('token');
-
             const respuesta = await axios.get(`http://localhost:3001/api/publicaciones/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
             const pub = respuesta.data;
-
-            // Pre-cargamos el formulario con los datos que ya tiene la publicación
             setForm({
                 titulo: pub.titulo,
                 descripcion: pub.descripcion || '',
@@ -60,9 +41,7 @@ const EditarPublicacion = () => {
                 superficie: pub.superficieM2 || '',
                 ambientes: pub.ambientes || ''
             });
-
             setCargando(false);
-
         } catch (error) {
             if (error.response?.status === 401) navigate('/');
             if (error.response?.status === 404) navigate('/mis-publicaciones');
@@ -70,12 +49,10 @@ const EditarPublicacion = () => {
         }
     };
 
-    // Función genérica para actualizar cualquier campo del formulario
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // Función que se ejecuta al presionar "Guardar"
     const handleGuardar = async (e) => {
         e.preventDefault();
         setError('');
@@ -84,18 +61,13 @@ const EditarPublicacion = () => {
 
         try {
             const token = localStorage.getItem('token');
-
             await axios.put(`http://localhost:3001/api/publicaciones/${id}`, form, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
             setExito('Publicación actualizada correctamente');
-
-            // Redirigimos a mis publicaciones después de 1.5 segundos
             setTimeout(() => {
                 navigate('/mis-publicaciones');
             }, 1500);
-
         } catch (error) {
             if (error.response?.status === 401) navigate('/');
             if (error.response?.status === 403) {
@@ -108,30 +80,32 @@ const EditarPublicacion = () => {
         }
     };
 
-    // Mientras carga los datos mostramos un mensaje
     if (cargando) {
-        return <div className="crear-wrap"><p style={{ color: '#9CA3AF' }}>Cargando...</p></div>;
+        return (
+            <AgentLayout title="Editar publicación">
+                <p className="empty-state">Cargando...</p>
+            </AgentLayout>
+        );
     }
 
     return (
-        <div className="crear-wrap">
-            <div className="crear-header">
-                <div>
-                    <h1 className="crear-titulo">Editar Publicación</h1>
-                    <p className="crear-subtitulo">Modificá los datos de la propiedad</p>
-                </div>
-                <button className="btn-volver" onClick={() => navigate('/mis-publicaciones')}>← Volver</button>
-            </div>
-
+        <AgentLayout
+            title="Editar publicación"
+            subtitle="Modificá los datos de la propiedad"
+            actions={
+                <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
+                    ← Volver
+                </button>
+            }
+        >
             <form onSubmit={handleGuardar} className="crear-form">
+                {error && <p className="alert alert-error">{error}</p>}
+                {exito && <p className="alert alert-ok">{exito}</p>}
 
-                {error && <p className="crear-error">{error}</p>}
-                {exito && <p className="crear-exito">{exito}</p>}
+                <div className="form-card">
+                    <h2 className="form-section-title">Datos de la propiedad</h2>
 
-                <div className="crear-seccion">
-                    <h2 className="crear-seccion-titulo">Datos de la propiedad</h2>
-
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Título *</label>
                         <input
                             type="text"
@@ -143,7 +117,7 @@ const EditarPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Descripción</label>
                         <textarea
                             name="descripcion"
@@ -154,15 +128,15 @@ const EditarPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-fila">
-                        <div className="crear-field">
+                    <div className="field-row">
+                        <div className="field">
                             <label>Tipo de operación *</label>
                             <select name="tipoOperacion" value={form.tipoOperacion} onChange={handleChange}>
                                 <option value="venta">Venta</option>
                                 <option value="alquiler">Alquiler</option>
                             </select>
                         </div>
-                        <div className="crear-field">
+                        <div className="field">
                             <label>Precio *</label>
                             <input
                                 type="number"
@@ -175,7 +149,7 @@ const EditarPublicacion = () => {
                         </div>
                     </div>
 
-                    <div className="crear-field">
+                    <div className="field">
                         <label>Dirección *</label>
                         <input
                             type="text"
@@ -187,8 +161,8 @@ const EditarPublicacion = () => {
                         />
                     </div>
 
-                    <div className="crear-fila">
-                        <div className="crear-field">
+                    <div className="field-row">
+                        <div className="field">
                             <label>Superficie (m²)</label>
                             <input
                                 type="number"
@@ -198,7 +172,7 @@ const EditarPublicacion = () => {
                                 placeholder="Ej: 200"
                             />
                         </div>
-                        <div className="crear-field">
+                        <div className="field">
                             <label>Ambientes</label>
                             <input
                                 type="number"
@@ -211,17 +185,16 @@ const EditarPublicacion = () => {
                     </div>
                 </div>
 
-                <div className="crear-botones">
-                    <button type="button" className="btn-cancelar" onClick={() => navigate('/mis-publicaciones')}>
+                <div className="form-actions">
+                    <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
                         Cancelar
                     </button>
-                    <button type="submit" className="btn-guardar" disabled={guardando}>
+                    <button type="submit" className="btn btn-primary" disabled={guardando}>
                         {guardando ? 'Guardando...' : 'Guardar'}
                     </button>
                 </div>
-
             </form>
-        </div>
+        </AgentLayout>
     );
 };
 
