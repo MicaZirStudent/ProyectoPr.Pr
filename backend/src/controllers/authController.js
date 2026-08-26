@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const Usuario = require('../../models/usuario');
 
 const registrar = async (req, res) => {
@@ -14,11 +15,13 @@ const registrar = async (req, res) => {
             return res.status(409).json({ mensaje: 'Ya existe un usuario con ese correo' });
         }
 
+        const passwordHasheada = await bcrypt.hash(password, 10);
+
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
             email,
-            password,
+            password: passwordHasheada,
             rol
         });
 
@@ -33,20 +36,19 @@ const registrar = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log('Body recibido:', req.body);
 
         if (!email || !password) {
             return res.status(400).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
         const usuario = await Usuario.findOne({ email });
-        console.log('Usuario encontrado:', usuario);
 
         if (!usuario) {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
-        if (password !== usuario.password) {
+        const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+        if (!passwordCorrecta) {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
