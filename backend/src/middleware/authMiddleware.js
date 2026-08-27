@@ -36,6 +36,16 @@ const verificarToken = (req, res, next) => {
         return res.status(401).json({ mensaje: 'Token inválido o expirado. Iniciá sesión nuevamente' });
     }
 };
+// Middleware para restringir el acceso según el rol del usuario
+// Se usa DESPUÉS de verificarToken, porque necesita que exista req.usuario
+const verificarRol = (...rolesPermitidos) => {
+    return (req, res, next) => {
+        if (!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
+            return res.status(403).json({ mensaje: 'No tenés permisos para realizar esta acción' });
+        }
+        next();
+    };
+};
 
 // Exportamos el middleware
-module.exports = { verificarToken };
+module.exports = { verificarToken, verificarRol };

@@ -1,17 +1,28 @@
-// Importamos express para usar su sistema de rutas
 const express = require('express');
-
-// Creamos el router
 const router = express.Router();
 
-// Importamos las funciones del controller
-const { crearPublicacion, obtenerMisPublicaciones, obtenerPublicacionPorId, editarPublicacion, enviarARevision } = require('../controllers/publicacionController');
+const { 
+    crearPublicacion, 
+    obtenerMisPublicaciones, 
+    obtenerPublicacionPorId, 
+    editarPublicacion, 
+    enviarARevision,
+    obtenerPublicacionesEnRevision,
+    aprobarPublicacion,
+    observarPublicacion
+} = require('../controllers/publicacionController');
 
-// Importamos el middleware de autenticación
-const { verificarToken } = require('../middleware/authMiddleware');
+const { verificarToken, verificarRol } = require('../middleware/authMiddleware');
 
 // GET /api/publicaciones/mis-publicaciones — trae las publicaciones del agente logueado
 router.get('/mis-publicaciones', verificarToken, obtenerMisPublicaciones);
+
+// ---------- CU-05: Revisar Publicación (Área Legal) ----------
+// Van ANTES de '/:id' para que Express no confunda "legal" con un id
+
+router.get('/legal/en-revision', verificarToken, verificarRol('Area legal'), obtenerPublicacionesEnRevision);
+router.patch('/legal/:id/aprobar', verificarToken, verificarRol('Area legal'), aprobarPublicacion);
+router.patch('/legal/:id/observar', verificarToken, verificarRol('Area legal'), observarPublicacion);
 
 // GET /api/publicaciones/:id — trae una publicación por su id
 router.get('/:id', verificarToken, obtenerPublicacionPorId);
@@ -25,5 +36,4 @@ router.put('/:id', verificarToken, editarPublicacion);
 // PATCH /api/publicaciones/:id/enviar-revision — cambia el estado a en_revision
 router.patch('/:id/enviar-revision', verificarToken, enviarARevision);
 
-// Exportamos el router
 module.exports = router;

@@ -1,26 +1,19 @@
 const mongoose = require('mongoose');
 
-const turnoSchema = new mongoose.Schema({
-  nombre_cliente: { type: String, required: true },
-  email_cliente: { type: String, required: true },
-  whatsapp_cliente: { type: String, required: true },
-  fecha: { type: Date, required: true },
-  hora: { type: String, required: true },
-  estado: { 
-    type: String, 
-    default: 'Pendiente',
-    enum: ['Pendiente', 'Confirmado', 'Cancelado']
+const notificacionSchema = new mongoose.Schema({
+  mensaje: { type: String, required: true },
+  fecha: { type: Date, default: Date.now },
+  leida: { type: Boolean, default: false },
+  id_usuario_destino: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
   },
-  id_publicacion: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Publicacion', 
-    required: true 
-  },
-  id_disponibilidad: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Disponibilidad', 
-    required: true 
+  id_publicacion: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Publicacion',
+    required: false
   }
 });
 
-module.exports = mongoose.model('Turno', turnoSchema);
+module.exports = mongoose.model('Notificacion', notificacionSchema);
