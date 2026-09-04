@@ -17,16 +17,12 @@ const MisPublicaciones = () => {
         try {
             const token = localStorage.getItem('token');
             const respuesta = await axios.get('http://localhost:3001/api/publicaciones/mis-publicaciones', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
             setPublicaciones(respuesta.data);
             setCargando(false);
         } catch (error) {
-            if (error.response?.status === 401) {
-                navigate('/');
-            }
+            if (error.response?.status === 401) navigate('/');
             setCargando(false);
         }
     };
@@ -46,11 +42,11 @@ const MisPublicaciones = () => {
 
     const colorEstado = (estado) => {
         const colores = {
-            borrador: '#9CA3AF',
-            en_revision: '#F59E0B',
-            observada: '#EF4444',
-            publicada: '#1a2b4a',
-            dada_de_baja: '#6B7280'
+            'Borrador': '#9CA3AF',
+            'En revision': '#F59E0B',
+            'Observada': '#EF4444',
+            'Publicada': '#1a2b4a',
+            'Dada de baja': '#6B7280'
         };
         return colores[estado] || '#9CA3AF';
     };
@@ -72,34 +68,34 @@ const MisPublicaciones = () => {
             ) : (
                 <div className="property-grid">
                     {publicaciones.map((pub) => (
-                        <article className="property-card" key={pub.idPublicacion}>
+                        <article className="property-card" key={pub._id}>
                             <div className="property-media">
-                                <span className="property-op">{pub.tipoOperacion}</span>
-                                <span className="estado-badge" style={{ backgroundColor: colorEstado(pub.estadoPublicacion) }}>
-                                    {pub.estadoPublicacion.replace('_', ' ')}
+                                <span className="property-op">{pub.tipo_operacion}</span>
+                                <span className="estado-badge" style={{ backgroundColor: colorEstado(pub.estado) }}>
+                                    {pub.estado}
                                 </span>
                             </div>
                             <div className="property-body">
                                 <h2>{pub.titulo}</h2>
                                 {pub.direccion && <p className="property-meta">{pub.direccion}</p>}
                                 <p className="property-meta">
-                                    {[pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
+                                    {[pub.superficie && `${pub.superficie} m²`, pub.ambientes && `${pub.ambientes} amb.`]
                                         .filter(Boolean)
                                         .join(' · ') || 'Datos de ficha pendientes'}
                                 </p>
-                                <p className="property-price">${Number(pub.precioPublicacion).toLocaleString('es-AR')}</p>
+                                <p className="property-price">${Number(pub.precio).toLocaleString('es-AR')}</p>
                                 <div className="property-actions">
-                                    {(pub.estadoPublicacion === 'borrador' || pub.estadoPublicacion === 'observada') && (
-                                        <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${pub.idPublicacion}`)}>
+                                    {(pub.estado === 'Borrador' || pub.estado === 'Observada') && (
+                                        <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${pub._id}`)}>
                                             Editar
                                         </button>
                                     )}
-                                    {pub.estadoPublicacion === 'borrador' && (
-                                        <button className="btn btn-navy" onClick={() => enviarARevision(pub.idPublicacion)}>
+                                    {pub.estado === 'Borrador' && (
+                                        <button className="btn btn-navy" onClick={() => enviarARevision(pub._id)}>
                                             Enviar a revisión
                                         </button>
                                     )}
-                                    {pub.estadoPublicacion === 'publicada' && (
+                                    {pub.estado === 'Publicada' && (
                                         <button className="btn btn-navy">Ver</button>
                                     )}
                                 </div>

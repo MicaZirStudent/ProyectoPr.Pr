@@ -2,11 +2,11 @@ const Publicacion = require('../../models/publicacion');
 const Observacion = require('../../models/observaciones');
 const Notificacion = require('../../models/notificacion');
 
-// ---------- FUNCIONES YA EXISTENTES (CU-01 a CU-04), MIGRADAS A MONGOOSE ----------
-
 // CU-02: Crear publicación
 const crearPublicacion = async (req, res) => {
     try {
+        console.log('Body recibido:', req.body);
+        console.log('Usuario del token:', req.usuario);
         const {
             titulo,
             descripcion,
@@ -26,7 +26,7 @@ const crearPublicacion = async (req, res) => {
         const nuevaPublicacion = new Publicacion({
             titulo,
             descripcion,
-            tipo_operacion: tipoOperacion,
+            tipo_operacion: tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1),
             precio,
             direccion,
             superficie,
@@ -58,7 +58,7 @@ const obtenerMisPublicaciones = async (req, res) => {
     }
 };
 
-// Obtener una publicación por id (del agente dueño)
+// Obtener una publicación por id
 const obtenerPublicacionPorId = async (req, res) => {
     try {
         const { id } = req.params;
@@ -76,7 +76,7 @@ const obtenerPublicacionPorId = async (req, res) => {
     }
 };
 
-// CU-03: Editar publicación (solo Borrador u Observada)
+// CU-03: Editar publicación
 const editarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -100,13 +100,12 @@ const editarPublicacion = async (req, res) => {
 
         publicacion.titulo = titulo;
         publicacion.descripcion = descripcion;
-        publicacion.tipo_operacion = tipoOperacion;
+        publicacion.tipo_operacion = tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1);
         publicacion.precio = precio;
         publicacion.direccion = direccion;
         publicacion.superficie = superficie;
         publicacion.ambientes = ambientes;
 
-        // Si estaba observada, vuelve a Borrador para reenviarla
         if (publicacion.estado === 'Observada') {
             publicacion.estado = 'Borrador';
         }
@@ -120,7 +119,7 @@ const editarPublicacion = async (req, res) => {
     }
 };
 
-// CU-04: Enviar a revisión (solo desde Borrador)
+// CU-04: Enviar a revisión
 const enviarARevision = async (req, res) => {
     try {
         const { id } = req.params;
@@ -146,9 +145,7 @@ const enviarARevision = async (req, res) => {
     }
 };
 
-// ---------- CU-05: REVISAR PUBLICACIÓN (Área Legal) ----------
-
-// Listado de publicaciones pendientes para el área legal
+// CU-05: Publicaciones en revisión para área legal
 const obtenerPublicacionesEnRevision = async (req, res) => {
     try {
         const publicaciones = await Publicacion.find({ estado: 'En revision' })
@@ -161,11 +158,10 @@ const obtenerPublicacionesEnRevision = async (req, res) => {
     }
 };
 
-// Aprobar publicación: En revision -> Aprobada -> Publicada, y notifica al agente
+// Aprobar publicación
 const aprobarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
-        const idUsuarioLegal = req.usuario.idUsuario;
 
         const publicacion = await Publicacion.findById(id);
 
@@ -177,7 +173,6 @@ const aprobarPublicacion = async (req, res) => {
             return res.status(403).json({ mensaje: 'Solo se pueden aprobar publicaciones en revisión' });
         }
 
-        // Paso intermedio + visibilidad pública
         publicacion.estado = 'Aprobada';
         await publicacion.save();
 
@@ -198,7 +193,7 @@ const aprobarPublicacion = async (req, res) => {
     }
 };
 
-// Observar publicación: En revision -> Observada, con comentario obligatorio
+// Observar publicación
 const observarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -206,7 +201,7 @@ const observarPublicacion = async (req, res) => {
         const idUsuarioLegal = req.usuario.idUsuario;
 
         if (!comentario || comentario.trim() === '') {
-            return res.status(400).json({ mensaje: 'Debe ingresar un comentario para poder registrar la observación' });
+            return res.status(400).json({ mensaje: 'Debe ingresar un comentario para registrar la observación' });
         }
 
         const publicacion = await Publicacion.findById(id);
