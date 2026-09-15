@@ -47,13 +47,22 @@ const MisPublicaciones = () => {
     const colorEstado = (estado) => {
         const colores = {
             borrador: '#9CA3AF',
+            Borrador: '#9CA3AF',
             en_revision: '#F59E0B',
+            'En revision': '#F59E0B',
+            'Enviada a revision': '#F59E0B',
             observada: '#EF4444',
+            Observada: '#EF4444',
             publicada: '#1a2b4a',
-            dada_de_baja: '#6B7280'
+            Publicada: '#1a2b4a',
+            dada_de_baja: '#6B7280',
+            'Dada de baja': '#6B7280'
         };
         return colores[estado] || '#9CA3AF';
     };
+
+    const idDe = (pub) => pub._id || pub.idPublicacion;
+    const estadoDe = (pub) => pub.estado || pub.estadoPublicacion || '';
 
     return (
         <AgentLayout
@@ -72,35 +81,35 @@ const MisPublicaciones = () => {
             ) : (
                 <div className="property-grid">
                     {publicaciones.map((pub) => (
-                        <article className="property-card" key={pub.idPublicacion}>
+                        <article className="property-card" key={idDe(pub)}>
                             <div className="property-media">
-                                <span className="property-op">{pub.tipoOperacion}</span>
-                                <span className="estado-badge" style={{ backgroundColor: colorEstado(pub.estadoPublicacion) }}>
-                                    {pub.estadoPublicacion.replace('_', ' ')}
+                                <span className="property-op">{pub.tipo_operacion || pub.tipoOperacion}</span>
+                                <span className="estado-badge" style={{ backgroundColor: colorEstado(estadoDe(pub)) }}>
+                                    {String(estadoDe(pub)).replace(/_/g, ' ')}
                                 </span>
                             </div>
                             <div className="property-body">
                                 <h2>{pub.titulo}</h2>
                                 {pub.direccion && <p className="property-meta">{pub.direccion}</p>}
                                 <p className="property-meta">
-                                    {[pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
+                                    {[pub.superficie && `${pub.superficie} m²`, pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
                                         .filter(Boolean)
                                         .join(' · ') || 'Datos de ficha pendientes'}
                                 </p>
-                                <p className="property-price">${Number(pub.precioPublicacion).toLocaleString('es-AR')}</p>
+                                <p className="property-price">${Number(pub.precio || pub.precioPublicacion || 0).toLocaleString('es-AR')}</p>
                                 <div className="property-actions">
-                                    {(pub.estadoPublicacion === 'borrador' || pub.estadoPublicacion === 'observada') && (
-                                        <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${pub.idPublicacion}`)}>
+                                    {(estadoDe(pub) === 'Borrador' || estadoDe(pub) === 'Observada') && (
+                                        <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${idDe(pub)}`)}>
                                             Editar
                                         </button>
                                     )}
-                                    {pub.estadoPublicacion === 'borrador' && (
-                                        <button className="btn btn-navy" onClick={() => enviarARevision(pub.idPublicacion)}>
+                                    {estadoDe(pub) === 'Borrador' && (
+                                        <button className="btn btn-navy" onClick={() => enviarARevision(idDe(pub))}>
                                             Enviar a revisión
                                         </button>
                                     )}
-                                    {pub.estadoPublicacion === 'publicada' && (
-                                        <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${pub.idPublicacion}`)}>Ver</button>
+                                    {estadoDe(pub) === 'Publicada' && (
+                                        <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${idDe(pub)}`)}>Ver</button>
                                     )}
                                 </div>
                             </div>

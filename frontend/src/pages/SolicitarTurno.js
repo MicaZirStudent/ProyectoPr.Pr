@@ -104,7 +104,7 @@ const SolicitarTurno = () => {
                 correoElectronico: correo.trim(),
                 telefono: whatsapp.trim(),
                 fechaHora: slot.fechaHora,
-                idPublicacion: Number(id)
+                idPublicacion: id
             });
 
             setExito(respuesta.data.mensaje);

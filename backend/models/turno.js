@@ -23,4 +23,10 @@ const turnoSchema = new mongoose.Schema({
   }
 });
 
+// Evita dos reservas activas en el mismo día y hora para la misma propiedad
+turnoSchema.index(
+  { id_publicacion: 1, fecha: 1, hora: 1 },
+  { unique: true, partialFilterExpression: { estado: { $in: ['Pendiente', 'Confirmado'] } } }
+);
+
 module.exports = mongoose.model('Turno', turnoSchema);
