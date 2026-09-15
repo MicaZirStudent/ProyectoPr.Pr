@@ -18,6 +18,8 @@ const db = require('./src/config/db');
 const authRoutes = require('./src/routes/authRoutes');
 // Importamos las rutas de publicaciones
 const publicacionRoutes = require('./src/routes/publicacionRoutes');
+// Importamos las rutas de turnos (solicitar visita)
+const turnoRoutes = require('./src/routes/turnoRoutes');
 
 // Creamos la aplicación de Express
 const app = express();
@@ -33,6 +35,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 // Rutas de publicaciones (protegidas por token)
 app.use('/api/publicaciones', publicacionRoutes);
+// Rutas de turnos (públicas: el cliente interesado no inicia sesión)
+app.use('/api/turnos', turnoRoutes);
 
 // Ruta de prueba: si entramos a localhost:3001/ vemos este mensaje
 app.get('/', (req, res) => {
