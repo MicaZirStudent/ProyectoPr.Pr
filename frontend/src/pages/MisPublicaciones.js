@@ -100,7 +100,7 @@ const MisPublicaciones = () => {
                                         </button>
                                     )}
                                     {pub.estadoPublicacion === 'publicada' && (
-                                        <button className="btn btn-navy">Ver</button>
+                                        <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${pub.idPublicacion}`)}>Ver</button>
                                     )}
                                 </div>
                             </div>

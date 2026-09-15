@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import MisPublicaciones from './pages/MisPublicaciones';
 import CrearPublicacion from './pages/CrearPublicacion';
 import EditarPublicacion from './pages/EditarPublicacion';
+import FichaPublicacion from './pages/FichaPublicacion';
+import SolicitarTurno from './pages/SolicitarTurno';
 
 const App = () => {
     return (
@@ -26,6 +28,12 @@ const App = () => {
 
                 {/* Editar publicación — el :id es dinámico, cambia según la publicación */}
                 <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
+
+                {/* Ficha pública de una propiedad publicada (el cliente no inicia sesión) */}
+                <Route path="/propiedad/:id" element={<FichaPublicacion />} />
+
+                {/* Formulario CU-09: solicitar turno de visita */}
+                <Route path="/propiedad/:id/solicitar-turno" element={<SolicitarTurno />} />
             </Routes>
         </BrowserRouter>
     );
