@@ -29,7 +29,9 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
 
     const activo = (path) => {
         if (path === '/mis-publicaciones') {
-            return location.pathname === path || location.pathname.startsWith('/editar-publicacion');
+            return location.pathname === path
+                || location.pathname.startsWith('/editar-publicacion')
+                || location.pathname.startsWith('/gestionar-disponibilidad');
         }
         return location.pathname === path;
     };

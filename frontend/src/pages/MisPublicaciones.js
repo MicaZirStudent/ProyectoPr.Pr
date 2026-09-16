@@ -109,7 +109,12 @@ const MisPublicaciones = () => {
                                         </button>
                                     )}
                                     {estadoDe(pub) === 'Publicada' && (
-                                        <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${idDe(pub)}`)}>Ver</button>
+                                        <>
+                                            <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${idDe(pub)}`)}>Ver</button>
+                                            <button className="btn btn-soft" onClick={() => navigate(`/gestionar-disponibilidad/${idDe(pub)}`)}>
+                                                Gestionar disponibilidad
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             </div>

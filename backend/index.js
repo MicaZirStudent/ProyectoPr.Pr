@@ -18,6 +18,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const publicacionRoutes = require('./src/routes/publicacionRoutes');
 // Importamos las rutas de turnos (solicitar visita)
 const turnoRoutes = require('./src/routes/turnoRoutes');
+const disponibilidadRoutes = require('./src/routes/disponibilidadRoutes');
 
 // Creamos la aplicación de Express
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/publicaciones', publicacionRoutes);
 // Rutas de turnos (públicas: el cliente interesado no inicia sesión)
 app.use('/api/turnos', turnoRoutes);
+app.use('/api/disponibilidad', disponibilidadRoutes);
 
 // Ruta de prueba: si entramos a localhost:3001/ vemos este mensaje
 app.get('/', (req, res) => {
