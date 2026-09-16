@@ -10,6 +10,7 @@ import EditarPublicacion from './pages/EditarPublicacion';
 import FichaPublicacion from './pages/FichaPublicacion';
 import SolicitarTurno from './pages/SolicitarTurno';
 import GestionarDisponibilidad from './pages/GestionarDisponibilidad';
+import GestionUsuarios from './pages/GestionUsuarios';
 
 const App = () => {
     return (
@@ -36,6 +37,7 @@ const App = () => {
                 {/* Formulario CU-09: solicitar turno de visita */}
                 <Route path="/propiedad/:id/solicitar-turno" element={<SolicitarTurno />} />
                 <Route path="/gestionar-disponibilidad/:id" element={<GestionarDisponibilidad />} />
+                <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
             </Routes>
         </BrowserRouter>
     );
