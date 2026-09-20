@@ -1,0 +1,238 @@
+.legal-tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: 2px solid var(--borde);
+    margin-bottom: 1.5rem;
+}
+
+.legal-tab {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 0.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    position: relative;
+    top: 2px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.legal-tab:hover {
+    color: var(--navy);
+}
+
+.legal-tab.activo {
+    color: var(--navy);
+    border-bottom-color: var(--gold);
+}
+
+.legal-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.legal-card {
+    display: flex;
+    background: var(--blanco);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--sombra);
+    border: 1px solid var(--borde);
+}
+
+.legal-card-media {
+    flex: 0 0 300px;
+    max-width: 300px;
+    min-height: 200px;
+    background: #e5e7eb;
+}
+
+.legal-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.legal-card-sinfoto {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.legal-card-info {
+    flex: 1;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.legal-card-titulo {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.legal-card-direccion {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.legal-card-meta {
+    margin: 0.1rem 0 0;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 1rem;
+}
+
+.legal-card-agente {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.legal-card-descripcion {
+    margin: 0.2rem 0 0;
+    font-size: 0.86rem;
+    color: var(--texto);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.legal-card-fecha {
+    margin: 0.4rem 0 0;
+    font-size: 0.85rem;
+    color: var(--navy);
+    font-weight: 600;
+}
+
+.legal-card-comentarios {
+    margin-top: 0.4rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.legal-card-comentarios-texto {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #991b1b;
+}
+
+.legal-card-comentarios-completo {
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    color: var(--texto);
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 0.9rem;
+    margin: 0 0 1rem;
+}
+
+.legal-card-acciones {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.7rem;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: #d97706;
+}
+
+.btn-success {
+    background: #16a34a;
+    color: #fff;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #15803d;
+}
+
+.legal-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 28, 50, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 100;
+}
+
+.legal-modal {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 1.75rem;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 48px rgba(26, 43, 74, 0.3);
+}
+
+.legal-modal textarea {
+    width: 100%;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--navy);
+    background: #fbfcfe;
+    outline: none;
+    resize: vertical;
+}
+
+.legal-titulo {
+    margin: 0 0 0.2rem;
+    font-size: 1.25rem;
+    color: var(--navy);
+}
+
+.legal-subtitulo {
+    margin: 0 0 1.1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.legal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.1rem;
+}
+
+@media (max-width: 720px) {
+    .legal-card {
+        flex-direction: column;
+    }
+
+    .legal-card-media {
+        flex: none;
+        max-width: none;
+        width: 100%;
+        height: 200px;
+    }
+}

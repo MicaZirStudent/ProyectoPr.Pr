@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
 import PublicacionMediaFields from '../components/PublicacionMediaFields';
-import { getPublicacionMedia, persistPublicacionMedia } from '../utils/publicacionMedia';
+import { withPublicacionMedia, persistPublicacionMedia, fotosADataUrls } from '../utils/publicacionMedia';
 import './CrearPublicacion.css';
 
 const EditarPublicacion = () => {
@@ -12,6 +12,7 @@ const EditarPublicacion = () => {
         titulo: '',
         descripcion: '',
         tipoOperacion: 'venta',
+        tipoPropiedad: '',
         precio: '',
         direccion: '',
         superficie: '',
@@ -27,6 +28,7 @@ const EditarPublicacion = () => {
 
     useEffect(() => {
         obtenerPublicacion();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const obtenerPublicacion = async () => {
@@ -35,15 +37,18 @@ const EditarPublicacion = () => {
             const respuesta = await axios.get(`http://localhost:3001/api/publicaciones/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const pub = respuesta.data;
+            const pub = withPublicacionMedia(respuesta.data);
             setForm({
                 titulo: pub.titulo,
                 descripcion: pub.descripcion || '',
-                tipoOperacion: pub.tipoOperacion,
-                precio: pub.precioPublicacion,
+                tipoOperacion: (pub.tipo_operacion || 'venta').toLowerCase(),
+                tipoPropiedad: pub.tipo_propiedad ? pub.tipo_propiedad.toLowerCase() : '',
+                precio: pub.precio ?? '',
                 direccion: pub.direccion,
-                superficie: pub.superficieM2 || '',
-                ambientes: pub.ambientes || ''
+                superficie: pub.superficie ?? '',
+                ambientes: pub.ambientes ?? '',
+                documentos: pub.documentos || [],
+                fotos: pub.fotos || []
             });
             setCargando(false);
         } catch (error) {
@@ -57,6 +62,10 @@ const EditarPublicacion = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const handleMediaChange = (campo, valor) => {
+        setForm({ ...form, [campo]: valor });
+    };
+
     const handleGuardar = async (e) => {
         e.preventDefault();
         setError('');
@@ -65,9 +74,12 @@ const EditarPublicacion = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3001/api/publicaciones/${id}`, form, {
+            const { documentos, fotos, ...payload } = form;
+            const imagenes = await fotosADataUrls(fotos);
+            await axios.put(`http://localhost:3001/api/publicaciones/${id}`, { ...payload, imagenes }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            await persistPublicacionMedia(id, documentos, fotos);
             setExito('Publicación actualizada correctamente');
             setTimeout(() => {
                 navigate('/mis-publicaciones');
@@ -141,6 +153,18 @@ const EditarPublicacion = () => {
                             </select>
                         </div>
                         <div className="field">
+                            <label>Tipo de propiedad</label>
+                            <select name="tipoPropiedad" value={form.tipoPropiedad} onChange={handleChange}>
+                                <option value="">Sin especificar</option>
+                                <option value="casa">Casa</option>
+                                <option value="departamento">Departamento</option>
+                                <option value="local">Local</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="field-row">
+                        <div className="field">
                             <label>Precio *</label>
                             <input
                                 type="number"
@@ -188,6 +212,12 @@ const EditarPublicacion = () => {
                         </div>
                     </div>
                 </div>
+
+                <PublicacionMediaFields
+                    documentos={form.documentos}
+                    fotos={form.fotos}
+                    onChange={handleMediaChange}
+                />
 
                 <div className="form-actions">
                     <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>

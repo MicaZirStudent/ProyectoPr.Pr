@@ -9,6 +9,7 @@ const MisPublicaciones = () => {
     const [publicaciones, setPublicaciones] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [imagenActual, setImagenActual] = useState({});
+    const [verComentariosPub, setVerComentariosPub] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,8 +43,11 @@ const MisPublicaciones = () => {
         }
     };
 
-    const eliminarPublicacion = async (idPublicacion) => {
-        if (!window.confirm('¿Estás seguro que querés eliminar esta publicación?')) return;
+    const eliminarPublicacion = async (idPublicacion, estaPublicada) => {
+        const mensaje = estaPublicada
+            ? '¿Estás seguro que querés eliminar esta publicación? Ya está publicada y dejará de verse en el catálogo.'
+            : '¿Estás seguro que querés eliminar esta publicación?';
+        if (!window.confirm(mensaje)) return;
         try {
             const token = localStorage.getItem('token');
             await axios.delete(`http://localhost:3001/api/publicaciones/${idPublicacion}`, {
@@ -148,6 +152,14 @@ const MisPublicaciones = () => {
                                         )}
                                     </div>
                                     <div className="property-body">
+                                        {estadoDe(pub) === 'Observada' && (
+                                            <div className="property-banner-observada">
+                                                <span>⚠ Tiene observaciones</span>
+                                                <button type="button" onClick={() => setVerComentariosPub(pub)}>
+                                                    Ver comentarios
+                                                </button>
+                                            </div>
+                                        )}
                                         <h2>{pub.titulo}</h2>
                                         <p className="property-meta">
                                             {[pub.direccion, pub.superficie && `${pub.superficie} m²`, pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
@@ -161,13 +173,18 @@ const MisPublicaciones = () => {
                                                     Editar
                                                 </button>
                                             )}
+                                            {estadoDe(pub) === 'Observada' && (
+                                                <button className="btn btn-outline" onClick={() => setVerComentariosPub(pub)}>
+                                                    Ver comentarios
+                                                </button>
+                                            )}
                                             {estadoDe(pub) === 'Borrador' && (
                                                 <button className="btn btn-navy" onClick={() => enviarARevision(id)}>
                                                     Enviar a revisión
                                                 </button>
                                             )}
-                                            {estadoDe(pub) === 'Borrador' && (
-                                                <button className="btn btn-danger" onClick={() => eliminarPublicacion(id)}>
+                                            {(estadoDe(pub) === 'Borrador' || estadoDe(pub) === 'Publicada') && (
+                                                <button className="btn btn-danger" onClick={() => eliminarPublicacion(id, estadoDe(pub) === 'Publicada')}>
                                                     Eliminar
                                                 </button>
                                             )}
@@ -187,6 +204,30 @@ const MisPublicaciones = () => {
                     </div>
                 )}
             </div>
+
+            {verComentariosPub && (
+                <div className="obs-modal-fondo" onClick={() => setVerComentariosPub(null)}>
+                    <div className="obs-modal" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="obs-modal-titulo">Observaciones del Área Legal</h2>
+                        <p className="obs-modal-subtitulo">{verComentariosPub.titulo}</p>
+                        <p className="obs-modal-texto">
+                            {verComentariosPub.comentarios_legal || 'No se registraron comentarios.'}
+                        </p>
+                        <div className="obs-modal-botones">
+                            <button type="button" className="btn btn-outline" onClick={() => setVerComentariosPub(null)}>
+                                Cerrar
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => navigate(`/editar-publicacion/${idDe(verComentariosPub)}`)}
+                            >
+                                Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AgentLayout>
     );
 };

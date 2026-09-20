@@ -12,6 +12,7 @@ import FichaPublicacion from './pages/FichaPublicacion';
 import SolicitarTurno from './pages/SolicitarTurno';
 import GestionarDisponibilidad from './pages/GestionarDisponibilidad';
 import GestionUsuarios from './pages/GestionUsuarios';
+import PublicacionesPendientes from './pages/legal/PublicacionesPendientes';
 
 const App = () => {
     return (
@@ -43,6 +44,9 @@ const App = () => {
                 <Route path="/propiedad/:id/solicitar-turno" element={<SolicitarTurno />} />
                 <Route path="/gestionar-disponibilidad/:id" element={<GestionarDisponibilidad />} />
                 <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
+
+                {/* Panel Área Legal: revisión, aprobación y observación de publicaciones */}
+                <Route path="/legal/publicaciones" element={<PublicacionesPendientes />} />
             </Routes>
         </BrowserRouter>
     );

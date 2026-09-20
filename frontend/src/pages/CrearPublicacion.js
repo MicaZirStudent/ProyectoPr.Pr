@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
 import PublicacionMediaFields from '../components/PublicacionMediaFields';
-import { persistPublicacionMedia } from '../utils/publicacionMedia';
+import { persistPublicacionMedia, fotosADataUrls } from '../utils/publicacionMedia';
 import './CrearPublicacion.css';
 
 const CrearPublicacion = () => {
@@ -41,7 +41,8 @@ const CrearPublicacion = () => {
         try {
             const token = localStorage.getItem('token');
             const { documentos, fotos, ...payload } = form;
-            const respuesta = await axios.post('http://localhost:3001/api/publicaciones/crear', payload, {
+            const imagenes = await fotosADataUrls(fotos);
+            const respuesta = await axios.post('http://localhost:3001/api/publicaciones/crear', { ...payload, imagenes }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

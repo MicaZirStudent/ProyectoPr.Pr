@@ -35,11 +35,14 @@ const publicacionSchema = new mongoose.Schema({
       'Dada de baja'
     ]
   },
-  id_agente: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Usuario', 
-    required: true 
-  }
+  id_agente: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
+  },
+  comentarios_legal: { type: String, default: '' },
+  fecha_revision: { type: Date },
+  usuario_revisor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Publicacion', publicacionSchema);

@@ -28,7 +28,8 @@ const app = express();
 app.use(cors());
 
 // Habilitamos que Express entienda JSON en el cuerpo de las peticiones
-app.use(express.json());
+// Límite alto porque las fotos de las publicaciones viajan como data URLs dentro del JSON
+app.use(express.json({ limit: '25mb' }));
 
 // Le decimos a Express: todo lo que llegue a /api/auth, mandalo a authRoutes
 // Por eso el login termina quedando en /api/auth/login y el registro en /api/auth/registrar

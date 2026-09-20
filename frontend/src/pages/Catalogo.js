@@ -65,6 +65,15 @@ const Catalogo = () => {
         buscar(filtros);
     };
 
+    const hayFiltrosActivos = Object.keys(FILTROS_INICIALES).some(
+        (clave) => filtros[clave] !== FILTROS_INICIALES[clave]
+    );
+
+    const limpiarFiltros = () => {
+        setFiltros(FILTROS_INICIALES);
+        buscar(FILTROS_INICIALES);
+    };
+
     return (
         <div className="catalogo-wrap">
             <header className="catalogo-header">
@@ -130,7 +139,14 @@ const Catalogo = () => {
                     </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary catalogo-buscar">Buscar</button>
+                <div className="catalogo-filtros-botones">
+                    {hayFiltrosActivos && (
+                        <button type="button" className="btn btn-outline" onClick={limpiarFiltros}>
+                            Limpiar filtros
+                        </button>
+                    )}
+                    <button type="submit" className="btn btn-primary catalogo-buscar">Buscar</button>
+                </div>
             </form>
 
             <main className="catalogo-resultados">

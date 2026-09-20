@@ -69,7 +69,10 @@
     width: 76px;
 }
 
-.catalogo-buscar {
+.catalogo-filtros-botones {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     align-self: flex-end;
     margin-left: auto;
 }
@@ -250,9 +253,13 @@
         height: 200px;
     }
 
-    .catalogo-buscar {
+    .catalogo-filtros-botones {
         width: 100%;
         margin-left: 0;
+    }
+
+    .catalogo-filtros-botones .btn {
+        flex: 1;
     }
 
     .catalogo-filtros {

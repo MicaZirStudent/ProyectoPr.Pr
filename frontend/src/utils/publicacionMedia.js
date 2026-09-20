@@ -1,12 +1,27 @@
 const storageKey = (id) => `solution_pub_media_${id}`;
 
-const fileToDataUrl = (file) =>
+export const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
+
+export const fotosADataUrls = async (fotos = []) => {
+    const convertidas = await Promise.all(
+        fotos.map(async (item) => {
+            if (typeof item.preview === 'string' && item.preview.startsWith('data:')) {
+                return item.preview;
+            }
+            if (item.file) {
+                return fileToDataUrl(item.file);
+            }
+            return null;
+        })
+    );
+    return convertidas.filter(Boolean);
+};
 
 export const persistPublicacionMedia = async (id, documentos = [], fotos = []) => {
     const fotosData = await Promise.all(

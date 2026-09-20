@@ -1,12 +1,21 @@
 const Publicacion = require('../../models/publicacion');
 const Observacion = require('../../models/observaciones');
 const Notificacion = require('../../models/notificacion');
+const Usuario = require('../../models/usuario');
+
+const notificarAreaLegal = async (mensaje, idPublicacion) => {
+    const usuariosLegal = await Usuario.find({ rol: 'Area legal' });
+    if (!usuariosLegal.length) return;
+    await Notificacion.insertMany(usuariosLegal.map((u) => ({
+        mensaje,
+        id_usuario_destino: u._id,
+        id_publicacion: idPublicacion
+    })));
+};
 
 // CU-02: Crear publicación
 const crearPublicacion = async (req, res) => {
     try {
-        console.log('Body recibido:', req.body);
-        console.log('Usuario del token:', req.usuario);
         const {
             titulo,
             descripcion,
@@ -15,7 +24,8 @@ const crearPublicacion = async (req, res) => {
             precio,
             direccion,
             superficie,
-            ambientes
+            ambientes,
+            imagenes
         } = req.body;
 
         const idUsuario = req.usuario.idUsuario;
@@ -33,6 +43,7 @@ const crearPublicacion = async (req, res) => {
             direccion,
             superficie,
             ambientes,
+            imagenes: Array.isArray(imagenes) ? imagenes : [],
             estado: 'Borrador',
             id_agente: idUsuario
         });
@@ -84,7 +95,7 @@ const editarPublicacion = async (req, res) => {
         const { id } = req.params;
         const idUsuario = req.usuario.idUsuario;
 
-        const { titulo, descripcion, tipoOperacion, precio, direccion, superficie, ambientes } = req.body;
+        const { titulo, descripcion, tipoOperacion, tipoPropiedad, precio, direccion, superficie, ambientes, imagenes } = req.body;
 
         if (!titulo || !tipoOperacion || !precio || !direccion) {
             return res.status(400).json({ mensaje: 'Complete todos los campos obligatorios' });
@@ -100,19 +111,32 @@ const editarPublicacion = async (req, res) => {
             return res.status(403).json({ mensaje: 'No se puede editar una publicación en este estado' });
         }
 
+        const eraObservada = publicacion.estado === 'Observada';
+
         publicacion.titulo = titulo;
         publicacion.descripcion = descripcion;
         publicacion.tipo_operacion = tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1);
+        publicacion.tipo_propiedad = tipoPropiedad ? tipoPropiedad.charAt(0).toUpperCase() + tipoPropiedad.slice(1) : undefined;
         publicacion.precio = precio;
         publicacion.direccion = direccion;
         publicacion.superficie = superficie;
         publicacion.ambientes = ambientes;
+        if (Array.isArray(imagenes)) {
+            publicacion.imagenes = imagenes;
+        }
 
-        if (publicacion.estado === 'Observada') {
-            publicacion.estado = 'Borrador';
+        if (eraObservada) {
+            publicacion.estado = 'Enviada a revision';
         }
 
         await publicacion.save();
+
+        if (eraObservada) {
+            await notificarAreaLegal(
+                `La publicación "${publicacion.titulo}" fue corregida y está nuevamente pendiente de revisión`,
+                publicacion._id
+            );
+        }
 
         res.json({ mensaje: 'Publicación actualizada correctamente' });
 
@@ -137,8 +161,13 @@ const enviarARevision = async (req, res) => {
             return res.status(403).json({ mensaje: 'Solo se pueden enviar a revisión publicaciones en borrador' });
         }
 
-        publicacion.estado = 'En revision';
+        publicacion.estado = 'Enviada a revision';
         await publicacion.save();
+
+        await notificarAreaLegal(
+            `Nueva publicación pendiente de revisión: "${publicacion.titulo}"`,
+            publicacion._id
+        );
 
         res.json({ mensaje: 'Publicación enviada a revisión correctamente' });
 
@@ -220,7 +249,10 @@ const obtenerPublicacionesPublicas = async (req, res) => {
     }
 };
 
-// Eliminar publicación (solo en estado Borrador)
+// Eliminar publicación: el agente puede hacerlo mientras no la envió a revisión (Borrador)
+// o una vez que ya fue aprobada (Publicada). Mientras está en revisión no puede eliminarla.
+const ESTADOS_ELIMINABLES = ['Borrador', 'Publicada'];
+
 const eliminarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -232,8 +264,8 @@ const eliminarPublicacion = async (req, res) => {
             return res.status(404).json({ mensaje: 'Publicación no encontrada' });
         }
 
-        if (publicacion.estado !== 'Borrador') {
-            return res.status(403).json({ mensaje: 'Solo se pueden eliminar publicaciones en borrador' });
+        if (!ESTADOS_ELIMINABLES.includes(publicacion.estado)) {
+            return res.status(403).json({ mensaje: 'No se puede eliminar una publicación mientras está en revisión' });
         }
 
         await publicacion.deleteOne();
@@ -245,16 +277,40 @@ const eliminarPublicacion = async (req, res) => {
     }
 };
 
-// CU-05: Publicaciones en revisión para área legal
-const obtenerPublicacionesEnRevision = async (req, res) => {
+// CU-05: Publicaciones pendientes de revisión para Área Legal
+const ESTADOS_PENDIENTES = ['Enviada a revision', 'En revision'];
+
+const obtenerPublicacionesPendientesRevision = async (req, res) => {
     try {
-        const publicaciones = await Publicacion.find({ estado: 'En revision' })
+        const publicaciones = await Publicacion.find({ estado: { $in: ESTADOS_PENDIENTES } })
             .populate('id_agente', 'nombre apellido email')
-            .sort({ createdAt: 1 });
+            .sort({ updatedAt: -1 });
 
         res.json(publicaciones);
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error al obtener publicaciones en revisión', error: error.message });
+        res.status(500).json({ mensaje: 'Error al obtener publicaciones pendientes', error: error.message });
+    }
+};
+
+// Historial de publicaciones ya revisadas por Área Legal
+const obtenerHistorialLegal = async (req, res) => {
+    try {
+        const { tipo } = req.query;
+
+        if (!['aprobadas', 'observadas'].includes(tipo)) {
+            return res.status(400).json({ mensaje: 'Parámetro tipo inválido. Use aprobadas u observadas' });
+        }
+
+        const estado = tipo === 'aprobadas' ? 'Publicada' : 'Observada';
+
+        const publicaciones = await Publicacion.find({ estado })
+            .populate('id_agente', 'nombre apellido email')
+            .populate('usuario_revisor', 'nombre apellido')
+            .sort({ fecha_revision: -1, updatedAt: -1 });
+
+        res.json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al obtener el historial', error: error.message });
     }
 };
 
@@ -262,6 +318,7 @@ const obtenerPublicacionesEnRevision = async (req, res) => {
 const aprobarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
+        const idUsuarioLegal = req.usuario.idUsuario;
 
         const publicacion = await Publicacion.findById(id);
 
@@ -269,19 +326,17 @@ const aprobarPublicacion = async (req, res) => {
             return res.status(404).json({ mensaje: 'Publicación no encontrada' });
         }
 
-        if (publicacion.estado !== 'En revision') {
-            return res.status(403).json({ mensaje: 'Solo se pueden aprobar publicaciones en revisión' });
+        if (!ESTADOS_PENDIENTES.includes(publicacion.estado)) {
+            return res.status(403).json({ mensaje: 'Solo se pueden aprobar publicaciones enviadas a revisión' });
         }
 
-        publicacion.estado = 'Aprobada';
-        await publicacion.save();
-
         publicacion.estado = 'Publicada';
+        publicacion.fecha_revision = new Date();
+        publicacion.usuario_revisor = idUsuarioLegal;
         await publicacion.save();
 
         await Notificacion.create({
-            asunto: 'Publicación aprobada',
-            mensaje: `Tu publicación "${publicacion.titulo}" fue aprobada y ya está visible en el portal.`,
+            mensaje: `¡Tu publicación "${publicacion.titulo}" fue aprobada y ya está visible en el catálogo!`,
             id_usuario_destino: publicacion.id_agente,
             id_publicacion: publicacion._id
         });
@@ -293,14 +348,14 @@ const aprobarPublicacion = async (req, res) => {
     }
 };
 
-// Observar publicación
+// Observar publicación (rechazar con comentarios)
 const observarPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
-        const { comentario } = req.body;
+        const { comentarios } = req.body;
         const idUsuarioLegal = req.usuario.idUsuario;
 
-        if (!comentario || comentario.trim() === '') {
+        if (!comentarios || comentarios.trim() === '') {
             return res.status(400).json({ mensaje: 'Debe ingresar un comentario para registrar la observación' });
         }
 
@@ -310,22 +365,24 @@ const observarPublicacion = async (req, res) => {
             return res.status(404).json({ mensaje: 'Publicación no encontrada' });
         }
 
-        if (publicacion.estado !== 'En revision') {
-            return res.status(403).json({ mensaje: 'Solo se pueden observar publicaciones en revisión' });
+        if (!ESTADOS_PENDIENTES.includes(publicacion.estado)) {
+            return res.status(403).json({ mensaje: 'Solo se pueden observar publicaciones enviadas a revisión' });
         }
 
         publicacion.estado = 'Observada';
+        publicacion.comentarios_legal = comentarios.trim();
+        publicacion.fecha_revision = new Date();
+        publicacion.usuario_revisor = idUsuarioLegal;
         await publicacion.save();
 
         await Observacion.create({
-            comentario,
+            comentario: comentarios.trim(),
             id_publicacion: publicacion._id,
             id_usuario_legal: idUsuarioLegal
         });
 
         await Notificacion.create({
-            asunto: 'Publicación observada',
-            mensaje: `Tu publicación "${publicacion.titulo}" fue observada. Motivo: ${comentario}`,
+            mensaje: `Tu publicación "${publicacion.titulo}" tiene observaciones. Motivo: ${comentarios.trim()}`,
             id_usuario_destino: publicacion.id_agente,
             id_publicacion: publicacion._id
         });
@@ -345,7 +402,8 @@ module.exports = {
     eliminarPublicacion,
     enviarARevision,
     obtenerPublicacionesPublicas,
-    obtenerPublicacionesEnRevision,
+    obtenerPublicacionesPendientesRevision,
+    obtenerHistorialLegal,
     aprobarPublicacion,
     observarPublicacion
 };

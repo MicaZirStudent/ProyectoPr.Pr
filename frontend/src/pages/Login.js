@@ -20,7 +20,11 @@ const Login = () => {
             });
             localStorage.setItem('token', respuesta.data.token);
             localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario));
-            navigate('/dashboard');
+            if (respuesta.data.usuario?.rol === 'Area legal') {
+                navigate('/legal/publicaciones');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (error) {
             setError('Usuario o contraseña incorrectos');
         }

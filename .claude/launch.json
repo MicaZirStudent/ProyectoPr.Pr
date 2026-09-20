@@ -9,8 +9,8 @@
     },
     {
       "name": "backend",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["backend/index.js"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--prefix", "backend"],
       "port": 3001
     }
   ]
