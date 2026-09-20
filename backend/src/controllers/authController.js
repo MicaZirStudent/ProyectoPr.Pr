@@ -52,6 +52,10 @@ const login = async (req, res) => {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
+        if (usuario.estado === 'Inactivo') {
+            return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
+        }
+
         const token = jwt.sign(
             { idUsuario: usuario._id, rol: usuario.rol },
             process.env.JWT_SECRET,

@@ -159,6 +159,7 @@ ALTER TABLE `publicacion`
 --
 ALTER TABLE `turno`
   ADD PRIMARY KEY (`idTurno`),
+  ADD UNIQUE KEY `uq_turno_publicacion_fecha` (`idPublicacion`,`fechaHora`),
   ADD KEY `idPublicacion` (`idPublicacion`),
   ADD KEY `idDisponibilidad` (`idDisponibilidad`);
 

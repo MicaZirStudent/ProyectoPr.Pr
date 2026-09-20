@@ -1,0 +1,90 @@
+.usr-error,
+.usr-exito {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin: 0 0 1rem;
+}
+
+.usr-error {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.usr-exito {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.usr-card {
+    background: #fff;
+    border: 1px solid #DDD8CE;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.usr-seccion {
+    margin: 0 0 1rem;
+    font-size: 16px;
+}
+
+.usr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.usr-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.usr-tabla-wrap {
+    overflow-x: auto;
+}
+
+.usr-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.usr-tabla th,
+.usr-tabla td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid #EEEAE3;
+    font-size: 14px;
+}
+
+.usr-acciones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.usr-modal-fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 40;
+}
+
+.usr-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 420px;
+    width: 100%;
+}
+
+.usr-modal-nombre {
+    color: #6B7280;
+    margin-top: 0.25rem;
+}

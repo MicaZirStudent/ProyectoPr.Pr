@@ -32,6 +32,13 @@ const Dashboard = () => {
                     <h2>Mis turnos</h2>
                     <p>Revisá las visitas agendadas</p>
                 </div>
+                {usuario?.rol === 'Administrador' && (
+                    <div className="dash-card" onClick={() => navigate('/gestion-usuarios')}>
+                        <span className="dash-card-icono">👤</span>
+                        <h2>Gestión de usuarios</h2>
+                        <p>Altas, modificaciones y bajas de cuentas internas</p>
+                    </div>
+                )}
             </div>
         </AgentLayout>
     );

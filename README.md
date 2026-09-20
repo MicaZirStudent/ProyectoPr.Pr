@@ -115,8 +115,8 @@ Tablero Trello: https://trello.com/b/5vqLCS8p/solution
 ## División del trabajo
 
 - Micaela Zirafa — CU-01 al CU-04 (Acceso y Publicaciones)
-- Brisa Gutierrez — CU-05 al CU-08 (Legal y Búsqueda pública)
-- Elias Villanueva — CU-09 al CU-12 (Turnos y Administración)
+- Elias Villanueva — CU-05 al CU-08 (Legal y Búsqueda pública)
+- Brisa Gutierrez — CU-09 al CU-12 (Turnos y Administración)
 
 ## Estructura del proyecto
 

@@ -22,6 +22,10 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
         navigate('/');
     };
 
+    const navItems = usuario?.rol === 'Administrador'
+        ? [...NAV_ITEMS, { path: '/gestion-usuarios', label: 'Usuarios', icon: '👤' }]
+        : NAV_ITEMS;
+
     const irA = (path) => {
         navigate(path);
         setMenuAbierto(false);
@@ -29,7 +33,9 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
 
     const activo = (path) => {
         if (path === '/mis-publicaciones') {
-            return location.pathname === path || location.pathname.startsWith('/editar-publicacion');
+            return location.pathname === path
+                || location.pathname.startsWith('/editar-publicacion')
+                || location.pathname.startsWith('/gestionar-disponibilidad');
         }
         return location.pathname === path;
     };
@@ -66,7 +72,7 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
             <aside className={`sidebar ${menuAbierto ? 'is-open' : ''}`}>
                 <p className="sidebar-label">Panel del agente</p>
                 <nav className="sidebar-nav">
-                    {NAV_ITEMS.map((item) => (
+                    {navItems.map((item) => (
                         <button
                             key={item.path}
                             type="button"
