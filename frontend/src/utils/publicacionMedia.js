@@ -55,7 +55,7 @@ export const getPublicacionMedia = (id) => {
 };
 
 export const withPublicacionMedia = (pub) => {
-    const media = getPublicacionMedia(pub.idPublicacion);
+    const media = getPublicacionMedia(pub._id || pub.idPublicacion);
     const fotos = Array.isArray(pub.imagenes) && pub.imagenes.length
         ? pub.imagenes.map((preview, i) => ({ name: `foto-${i + 1}`, preview }))
         : media.fotos;

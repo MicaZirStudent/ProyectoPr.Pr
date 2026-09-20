@@ -1,1 +1,123 @@
-/* Los estilos de cards viven en index.css para reutilizarlos en todo el panel. */
+/* Rediseño de cards: imagen arriba (250px) + info abajo, 2 columnas en desktop. */
+
+.mis-publicaciones .property-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.mis-publicaciones .property-card {
+    box-shadow: 0 16px 36px rgba(26, 43, 74, 0.14);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mis-publicaciones .property-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(26, 43, 74, 0.22);
+}
+
+.mis-publicaciones .property-media {
+    position: relative;
+    height: 250px;
+    padding: 0;
+    display: block;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.mis-publicaciones .property-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mis-publicaciones .property-sin-foto {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e5e7eb;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.mis-publicaciones .property-badges {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+
+.mis-publicaciones .property-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(26, 43, 74, 0.55);
+    color: var(--blanco);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mis-publicaciones .property-nav:hover:not(:disabled) {
+    background: var(--navy);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.mis-publicaciones .property-nav:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.mis-publicaciones .property-nav-prev {
+    left: 0.6rem;
+}
+
+.mis-publicaciones .property-nav-next {
+    right: 0.6rem;
+}
+
+.mis-publicaciones .property-indicador {
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--blanco);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+}
+
+.mis-publicaciones .btn-danger {
+    background: #ef4444;
+    color: var(--blanco);
+}
+
+.mis-publicaciones .btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+@media (max-width: 700px) {
+    .mis-publicaciones .property-grid {
+        grid-template-columns: 1fr;
+    }
+}

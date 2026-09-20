@@ -145,6 +145,31 @@ const enviarARevision = async (req, res) => {
     }
 };
 
+// Eliminar publicación (solo en estado Borrador)
+const eliminarPublicacion = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const idUsuario = req.usuario.idUsuario;
+
+        const publicacion = await Publicacion.findOne({ _id: id, id_agente: idUsuario });
+
+        if (!publicacion) {
+            return res.status(404).json({ mensaje: 'Publicación no encontrada' });
+        }
+
+        if (publicacion.estado !== 'Borrador') {
+            return res.status(403).json({ mensaje: 'Solo se pueden eliminar publicaciones en borrador' });
+        }
+
+        await publicacion.deleteOne();
+
+        res.json({ mensaje: 'Publicación eliminada correctamente' });
+
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al eliminar la publicación', error: error.message });
+    }
+};
+
 // CU-05: Publicaciones en revisión para área legal
 const obtenerPublicacionesEnRevision = async (req, res) => {
     try {
@@ -242,6 +267,7 @@ module.exports = {
     obtenerMisPublicaciones,
     obtenerPublicacionPorId,
     editarPublicacion,
+    eliminarPublicacion,
     enviarARevision,
     obtenerPublicacionesEnRevision,
     aprobarPublicacion,

@@ -36,18 +36,24 @@ const registrar = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('EMAIL:', email);
+        console.log('PASSWORD:', password);
+        console.log('BODY COMPLETO:', req.body);
 
         if (!email || !password) {
             return res.status(400).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
         const usuario = await Usuario.findOne({ email });
+        console.log('USUARIO ENCONTRADO:', usuario);
 
         if (!usuario) {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
         const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+        console.log('PASSWORD CORRECTA:', passwordCorrecta);
+
         if (!passwordCorrecta) {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }

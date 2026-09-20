@@ -5,7 +5,8 @@ const {
     crearPublicacion, 
     obtenerMisPublicaciones, 
     obtenerPublicacionPorId, 
-    editarPublicacion, 
+    editarPublicacion,
+    eliminarPublicacion,
     enviarARevision,
     obtenerPublicacionesEnRevision,
     aprobarPublicacion,
@@ -32,6 +33,9 @@ router.post('/crear', verificarToken, crearPublicacion);
 
 // PUT /api/publicaciones/:id — edita una publicación existente
 router.put('/:id', verificarToken, editarPublicacion);
+
+// DELETE /api/publicaciones/:id — elimina una publicación en borrador
+router.delete('/:id', verificarToken, eliminarPublicacion);
 
 // PATCH /api/publicaciones/:id/enviar-revision — cambia el estado a en_revision
 router.patch('/:id/enviar-revision', verificarToken, enviarARevision);

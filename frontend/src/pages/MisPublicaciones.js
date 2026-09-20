@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import { withPublicacionMedia } from '../utils/publicacionMedia';
 import './MisPublicaciones.css';
 
 const MisPublicaciones = () => {
     const [publicaciones, setPublicaciones] = useState([]);
     const [cargando, setCargando] = useState(true);
+    const [imagenActual, setImagenActual] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,6 +42,20 @@ const MisPublicaciones = () => {
         }
     };
 
+    const eliminarPublicacion = async (idPublicacion) => {
+        if (!window.confirm('¿Estás seguro que querés eliminar esta publicación?')) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:3001/api/publicaciones/${idPublicacion}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            obtenerPublicaciones();
+        } catch (error) {
+            if (error.response?.status === 401) return navigate('/');
+            alert(error.response?.data?.mensaje || 'No se pudo eliminar la publicación');
+        }
+    };
+
     const colorEstado = (estado) => {
         const colores = {
             borrador: '#9CA3AF',
@@ -59,6 +75,15 @@ const MisPublicaciones = () => {
 
     const idDe = (pub) => pub._id || pub.idPublicacion;
     const estadoDe = (pub) => pub.estado || pub.estadoPublicacion || '';
+    const imagenesDe = (pub) => withPublicacionMedia(pub).fotos.map((foto) => foto.preview || foto).filter(Boolean);
+
+    const cambiarImagen = (idPublicacion, delta, totalImagenes) => {
+        setImagenActual((prev) => {
+            const actual = prev[idPublicacion] || 0;
+            const siguiente = Math.min(Math.max(actual + delta, 0), totalImagenes - 1);
+            return { ...prev, [idPublicacion]: siguiente };
+        });
+    };
 
     return (
         <AgentLayout
@@ -70,54 +95,98 @@ const MisPublicaciones = () => {
                 </button>
             }
         >
-            {cargando ? (
-                <p className="empty-state">Cargando publicaciones...</p>
-            ) : publicaciones.length === 0 ? (
-                <p className="empty-state">No tenés publicaciones todavía. ¡Creá una!</p>
-            ) : (
-                <div className="property-grid">
-                    {publicaciones.map((pub) => (
-                        <article className="property-card" key={idDe(pub)}>
-                            <div className="property-media">
-                                <span className="property-op">{pub.tipo_operacion || pub.tipoOperacion}</span>
-                                <span className="estado-badge" style={{ backgroundColor: colorEstado(estadoDe(pub)) }}>
-                                    {String(estadoDe(pub)).replace(/_/g, ' ')}
-                                </span>
-                            </div>
-                            <div className="property-body">
-                                <h2>{pub.titulo}</h2>
-                                {pub.direccion && <p className="property-meta">{pub.direccion}</p>}
-                                <p className="property-meta">
-                                    {[pub.superficie && `${pub.superficie} m²`, pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
-                                        .filter(Boolean)
-                                        .join(' · ') || 'Datos de ficha pendientes'}
-                                </p>
-                                <p className="property-price">${Number(pub.precio || pub.precioPublicacion || 0).toLocaleString('es-AR')}</p>
-                                <div className="property-actions">
-                                    {(estadoDe(pub) === 'Borrador' || estadoDe(pub) === 'Observada') && (
-                                        <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${idDe(pub)}`)}>
-                                            Editar
-                                        </button>
-                                    )}
-                                    {estadoDe(pub) === 'Borrador' && (
-                                        <button className="btn btn-navy" onClick={() => enviarARevision(idDe(pub))}>
-                                            Enviar a revisión
-                                        </button>
-                                    )}
-                                    {estadoDe(pub) === 'Publicada' && (
-                                        <>
-                                            <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${idDe(pub)}`)}>Ver</button>
-                                            <button className="btn btn-soft" onClick={() => navigate(`/gestionar-disponibilidad/${idDe(pub)}`)}>
-                                                Gestionar disponibilidad
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        </article>
-                    ))}
-                </div>
-            )}
+            <div className="mis-publicaciones">
+                {cargando ? (
+                    <p className="empty-state">Cargando publicaciones...</p>
+                ) : publicaciones.length === 0 ? (
+                    <p className="empty-state">No tenés publicaciones todavía. ¡Creá una!</p>
+                ) : (
+                    <div className="property-grid">
+                        {publicaciones.map((pub) => {
+                            const id = idDe(pub);
+                            const imagenes = imagenesDe(pub);
+                            const indice = Math.min(imagenActual[id] || 0, Math.max(imagenes.length - 1, 0));
+
+                            return (
+                                <article className="property-card" key={id}>
+                                    <div className="property-media">
+                                        {imagenes.length > 0 ? (
+                                            <img className="property-img" src={imagenes[indice]} alt={pub.titulo} />
+                                        ) : (
+                                            <div className="property-sin-foto">Sin foto</div>
+                                        )}
+
+                                        <div className="property-badges">
+                                            <span className="property-op">{pub.tipo_operacion || pub.tipoOperacion}</span>
+                                            <span className="estado-badge" style={{ backgroundColor: colorEstado(estadoDe(pub)) }}>
+                                                {String(estadoDe(pub)).replace(/_/g, ' ')}
+                                            </span>
+                                        </div>
+
+                                        {imagenes.length > 1 && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="property-nav property-nav-prev"
+                                                    onClick={() => cambiarImagen(id, -1, imagenes.length)}
+                                                    disabled={indice === 0}
+                                                    aria-label="Imagen anterior"
+                                                >
+                                                    ‹
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="property-nav property-nav-next"
+                                                    onClick={() => cambiarImagen(id, 1, imagenes.length)}
+                                                    disabled={indice === imagenes.length - 1}
+                                                    aria-label="Imagen siguiente"
+                                                >
+                                                    ›
+                                                </button>
+                                                <span className="property-indicador">{indice + 1}/{imagenes.length}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="property-body">
+                                        <h2>{pub.titulo}</h2>
+                                        <p className="property-meta">
+                                            {[pub.direccion, pub.superficie && `${pub.superficie} m²`, pub.superficieM2 && `${pub.superficieM2} m²`, pub.ambientes && `${pub.ambientes} amb.`]
+                                                .filter(Boolean)
+                                                .join(' · ') || 'Datos de ficha pendientes'}
+                                        </p>
+                                        <p className="property-price">${Number(pub.precio || pub.precioPublicacion || 0).toLocaleString('es-AR')}</p>
+                                        <div className="property-actions">
+                                            {(estadoDe(pub) === 'Borrador' || estadoDe(pub) === 'Observada') && (
+                                                <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${id}`)}>
+                                                    Editar
+                                                </button>
+                                            )}
+                                            {estadoDe(pub) === 'Borrador' && (
+                                                <button className="btn btn-navy" onClick={() => enviarARevision(id)}>
+                                                    Enviar a revisión
+                                                </button>
+                                            )}
+                                            {estadoDe(pub) === 'Borrador' && (
+                                                <button className="btn btn-danger" onClick={() => eliminarPublicacion(id)}>
+                                                    Eliminar
+                                                </button>
+                                            )}
+                                            {estadoDe(pub) === 'Publicada' && (
+                                                <>
+                                                    <button className="btn btn-navy" onClick={() => navigate(`/propiedad/${id}`)}>Ver</button>
+                                                    <button className="btn btn-soft" onClick={() => navigate(`/gestionar-disponibilidad/${id}`)}>
+                                                        Gestionar disponibilidad
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </AgentLayout>
     );
 };
