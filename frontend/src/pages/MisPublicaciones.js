@@ -24,7 +24,7 @@ const MisPublicaciones = () => {
             setPublicaciones(respuesta.data);
             setCargando(false);
         } catch (error) {
-            if (error.response?.status === 401) navigate('/');
+            if (error.response?.status === 401) navigate('/login');
             setCargando(false);
         }
     };
@@ -37,7 +37,7 @@ const MisPublicaciones = () => {
             });
             obtenerPublicaciones();
         } catch (error) {
-            if (error.response?.status === 401) navigate('/');
+            if (error.response?.status === 401) navigate('/login');
             alert('No se pudo enviar a revisión');
         }
     };
@@ -51,7 +51,7 @@ const MisPublicaciones = () => {
             });
             obtenerPublicaciones();
         } catch (error) {
-            if (error.response?.status === 401) return navigate('/');
+            if (error.response?.status === 401) return navigate('/login');
             alert(error.response?.data?.mensaje || 'No se pudo eliminar la publicación');
         }
     };

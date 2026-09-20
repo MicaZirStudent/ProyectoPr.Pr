@@ -68,6 +68,14 @@ const Login = () => {
                         <a className="login-forgot" href="/recuperar">¿Olvidaste tu contraseña?</a>
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar</button>
                     </form>
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ width: '100%', marginTop: '0.9rem' }}
+                        onClick={() => navigate('/')}
+                    >
+                        ← Volver al catálogo
+                    </button>
                     <p className="login-footer">Sistema de gestión inmobiliaria — uso interno</p>
                 </div>
             </section>

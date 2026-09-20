@@ -3,10 +3,14 @@ const mongoose = require('mongoose');
 const publicacionSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   descripcion: { type: String, required: true },
-  tipo_operacion: { 
-    type: String, 
+  tipo_operacion: {
+    type: String,
     required: true,
     enum: ['Venta', 'Alquiler']
+  },
+  tipo_propiedad: {
+    type: String,
+    enum: ['Casa', 'Departamento', 'Local']
   },
   precio: { type: Number, required: true },
   direccion: { type: String, required: true },

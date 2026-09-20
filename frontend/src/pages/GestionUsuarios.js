@@ -36,7 +36,7 @@ const GestionUsuarios = () => {
             setUsuarios(respuesta.data);
         } catch (err) {
             if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/');
+                navigate('/login');
                 return;
             }
             setError(err.response?.data?.mensaje || 'No se pudieron cargar los usuarios');
@@ -111,7 +111,7 @@ const GestionUsuarios = () => {
             await cargar();
         } catch (err) {
             if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/');
+                navigate('/login');
                 return;
             }
             setError(err.response?.data?.mensaje || 'Complete todos los campos obligatorios');

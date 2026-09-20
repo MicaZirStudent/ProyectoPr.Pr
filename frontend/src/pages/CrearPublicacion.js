@@ -11,6 +11,7 @@ const CrearPublicacion = () => {
         titulo: '',
         descripcion: '',
         tipoOperacion: 'venta',
+        tipoPropiedad: '',
         precio: '',
         direccion: '',
         superficie: '',
@@ -54,7 +55,7 @@ const CrearPublicacion = () => {
             }, 1500);
         } catch (error) {
             if (error.response?.status === 401) {
-                navigate('/');
+                navigate('/login');
             }
             setError('Complete todos los campos obligatorios');
         } finally {
@@ -110,6 +111,18 @@ const CrearPublicacion = () => {
                                 <option value="alquiler">Alquiler</option>
                             </select>
                         </div>
+                        <div className="field">
+                            <label>Tipo de propiedad</label>
+                            <select name="tipoPropiedad" value={form.tipoPropiedad} onChange={handleChange}>
+                                <option value="">Sin especificar</option>
+                                <option value="casa">Casa</option>
+                                <option value="departamento">Departamento</option>
+                                <option value="local">Local</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="field-row">
                         <div className="field">
                             <label>Precio *</label>
                             <input

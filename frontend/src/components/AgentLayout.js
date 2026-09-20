@@ -19,7 +19,7 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
     const cerrarSesion = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
-        navigate('/');
+        navigate('/login');
     };
 
     const navItems = usuario?.rol === 'Administrador'

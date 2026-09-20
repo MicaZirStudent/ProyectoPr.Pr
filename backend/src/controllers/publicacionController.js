@@ -11,6 +11,7 @@ const crearPublicacion = async (req, res) => {
             titulo,
             descripcion,
             tipoOperacion,
+            tipoPropiedad,
             precio,
             direccion,
             superficie,
@@ -27,6 +28,7 @@ const crearPublicacion = async (req, res) => {
             titulo,
             descripcion,
             tipo_operacion: tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1),
+            tipo_propiedad: tipoPropiedad ? tipoPropiedad.charAt(0).toUpperCase() + tipoPropiedad.slice(1) : undefined,
             precio,
             direccion,
             superficie,
@@ -142,6 +144,79 @@ const enviarARevision = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ mensaje: 'Error al enviar a revisión', error: error.message });
+    }
+};
+
+// CU-catálogo: búsqueda pública de propiedades publicadas (sin login)
+const OPERACIONES_VALIDAS = ['venta', 'alquiler'];
+const PROPIEDADES_VALIDAS = ['casa', 'departamento', 'local'];
+const AMBIENTES_VALIDOS = ['1', '2', '3', '4', '4+'];
+
+const obtenerPublicacionesPublicas = async (req, res) => {
+    try {
+        const { tipo_operacion, tipo_propiedad, ambientes, precio_desde, precio_hasta } = req.query;
+
+        const filtro = { estado: 'Publicada' };
+
+        if (tipo_operacion) {
+            if (!OPERACIONES_VALIDAS.includes(String(tipo_operacion).toLowerCase())) {
+                return res.status(400).json({ success: false, mensaje: 'tipo_operacion inválido' });
+            }
+            filtro.tipo_operacion = new RegExp(`^${tipo_operacion}$`, 'i');
+        }
+
+        if (tipo_propiedad) {
+            if (!PROPIEDADES_VALIDAS.includes(String(tipo_propiedad).toLowerCase())) {
+                return res.status(400).json({ success: false, mensaje: 'tipo_propiedad inválido' });
+            }
+            filtro.tipo_propiedad = new RegExp(`^${tipo_propiedad}$`, 'i');
+        }
+
+        if (ambientes) {
+            if (!AMBIENTES_VALIDOS.includes(String(ambientes))) {
+                return res.status(400).json({ success: false, mensaje: 'ambientes inválido' });
+            }
+            filtro.ambientes = ambientes === '4+' ? { $gte: 4 } : Number(ambientes);
+        }
+
+        if (precio_desde !== undefined && precio_desde !== '') {
+            const desde = Number(precio_desde);
+            if (Number.isNaN(desde) || desde < 0) {
+                return res.status(400).json({ success: false, mensaje: 'precio_desde inválido' });
+            }
+            filtro.precio = { ...(filtro.precio || {}), $gte: desde };
+        }
+
+        if (precio_hasta !== undefined && precio_hasta !== '') {
+            const hasta = Number(precio_hasta);
+            if (Number.isNaN(hasta) || hasta < 0) {
+                return res.status(400).json({ success: false, mensaje: 'precio_hasta inválido' });
+            }
+            filtro.precio = { ...(filtro.precio || {}), $lte: hasta };
+        }
+
+        const publicaciones = await Publicacion.find(filtro)
+            .populate('id_agente', 'nombre apellido')
+            .sort({ createdAt: -1 });
+
+        const propiedades = publicaciones.map((pub) => ({
+            _id: pub._id,
+            titulo: pub.titulo,
+            tipo_operacion: pub.tipo_operacion,
+            tipo_propiedad: pub.tipo_propiedad || null,
+            precio: pub.precio,
+            direccion: pub.direccion,
+            superficie: pub.superficie,
+            ambientes: pub.ambientes,
+            imagenes: pub.imagenes,
+            descripcion: pub.descripcion,
+            agente: pub.id_agente ? `${pub.id_agente.nombre} ${pub.id_agente.apellido}` : null
+        }));
+
+        res.json({ success: true, total: propiedades.length, propiedades });
+
+    } catch (error) {
+        res.status(500).json({ success: false, mensaje: 'Error al buscar publicaciones', error: error.message });
     }
 };
 
@@ -269,6 +344,7 @@ module.exports = {
     editarPublicacion,
     eliminarPublicacion,
     enviarARevision,
+    obtenerPublicacionesPublicas,
     obtenerPublicacionesEnRevision,
     aprobarPublicacion,
     observarPublicacion

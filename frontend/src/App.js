@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Importamos todas las pantallas
 import Login from './pages/Login';
+import Catalogo from './pages/Catalogo';
 import Dashboard from './pages/Dashboard';
 import MisPublicaciones from './pages/MisPublicaciones';
 import CrearPublicacion from './pages/CrearPublicacion';
@@ -16,8 +17,12 @@ const App = () => {
     return (
         <BrowserRouter>
             <Routes>
+                {/* Catálogo público de propiedades — página de inicio (sin login) */}
+                <Route path="/" element={<Catalogo />} />
+                <Route path="/catalogo" element={<Catalogo />} />
+
                 {/* Pantalla de login */}
-                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
 
                 {/* Dashboard principal */}
                 <Route path="/dashboard" element={<Dashboard />} />

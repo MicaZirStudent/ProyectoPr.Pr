@@ -8,6 +8,7 @@ const {
     editarPublicacion,
     eliminarPublicacion,
     enviarARevision,
+    obtenerPublicacionesPublicas,
     obtenerPublicacionesEnRevision,
     aprobarPublicacion,
     observarPublicacion
@@ -17,6 +18,10 @@ const { verificarToken, verificarRol } = require('../middleware/authMiddleware')
 
 // GET /api/publicaciones/mis-publicaciones — trae las publicaciones del agente logueado
 router.get('/mis-publicaciones', verificarToken, obtenerMisPublicaciones);
+
+// GET /api/publicaciones/publicas — catálogo público de propiedades publicadas (sin login)
+// Va ANTES de '/:id' para que Express no confunda "publicas" con un id
+router.get('/publicas', obtenerPublicacionesPublicas);
 
 // ---------- CU-05: Revisar Publicación (Área Legal) ----------
 // Van ANTES de '/:id' para que Express no confunda "legal" con un id

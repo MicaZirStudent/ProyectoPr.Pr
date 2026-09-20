@@ -41,7 +41,7 @@ const GestionarDisponibilidad = () => {
                 setSeleccion(actual);
             } catch (err) {
                 if (err.response?.status === 401) {
-                    navigate('/');
+                    navigate('/login');
                     return;
                 }
                 setError(err.response?.data?.mensaje || 'No se pudo cargar la disponibilidad');
@@ -88,7 +88,7 @@ const GestionarDisponibilidad = () => {
             setExito(respuesta.data.mensaje);
         } catch (err) {
             if (err.response?.status === 401) {
-                navigate('/');
+                navigate('/login');
                 return;
             }
             setError(err.response?.data?.mensaje || MENSAJE_VACIO);

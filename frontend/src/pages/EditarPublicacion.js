@@ -47,7 +47,7 @@ const EditarPublicacion = () => {
             });
             setCargando(false);
         } catch (error) {
-            if (error.response?.status === 401) navigate('/');
+            if (error.response?.status === 401) navigate('/login');
             if (error.response?.status === 404) navigate('/mis-publicaciones');
             setCargando(false);
         }
@@ -73,7 +73,7 @@ const EditarPublicacion = () => {
                 navigate('/mis-publicaciones');
             }, 1500);
         } catch (error) {
-            if (error.response?.status === 401) navigate('/');
+            if (error.response?.status === 401) navigate('/login');
             if (error.response?.status === 403) {
                 setError('No se puede editar una publicación en este estado');
             } else {
