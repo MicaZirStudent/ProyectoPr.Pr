@@ -154,7 +154,7 @@ const PublicacionesPendientes = () => {
                                 <h2 className="legal-card-titulo">{pub.titulo}</h2>
                                 <p className="legal-card-direccion">{pub.direccion}</p>
                                 <p className="legal-card-meta">
-                                    ${Number(pub.precio || 0).toLocaleString('es-AR')}
+                                    {pub.moneda === 'ARS' ? 'AR$' : 'US$'} {Number(pub.precio || 0).toLocaleString('es-AR')}
                                     {pub.superficie ? ` · ${pub.superficie} m²` : ''}
                                     {pub.ambientes ? ` · ${pub.ambientes} amb.` : ''}
                                 </p>

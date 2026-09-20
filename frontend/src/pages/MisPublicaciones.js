@@ -166,7 +166,9 @@ const MisPublicaciones = () => {
                                                 .filter(Boolean)
                                                 .join(' · ') || 'Datos de ficha pendientes'}
                                         </p>
-                                        <p className="property-price">${Number(pub.precio || pub.precioPublicacion || 0).toLocaleString('es-AR')}</p>
+                                        <p className="property-price">
+                                            {pub.moneda === 'ARS' ? 'AR$' : 'US$'} {Number(pub.precio || pub.precioPublicacion || 0).toLocaleString('es-AR')}
+                                        </p>
                                         <div className="property-actions">
                                             {(estadoDe(pub) === 'Borrador' || estadoDe(pub) === 'Observada') && (
                                                 <button className="btn btn-soft" onClick={() => navigate(`/editar-publicacion/${id}`)}>

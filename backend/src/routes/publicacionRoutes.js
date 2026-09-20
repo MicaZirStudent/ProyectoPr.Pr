@@ -9,6 +9,7 @@ const {
     eliminarPublicacion,
     enviarARevision,
     obtenerPublicacionesPublicas,
+    obtenerPublicacionPublicaPorId,
     obtenerPublicacionesPendientesRevision,
     obtenerHistorialLegal,
     aprobarPublicacion,
@@ -23,6 +24,9 @@ router.get('/mis-publicaciones', verificarToken, obtenerMisPublicaciones);
 // GET /api/publicaciones/publicas — catálogo público de propiedades publicadas (sin login)
 // Va ANTES de '/:id' para que Express no confunda "publicas" con un id
 router.get('/publicas', obtenerPublicacionesPublicas);
+
+// GET /api/publicaciones/publicas/:id — ficha pública de una propiedad publicada (sin login)
+router.get('/publicas/:id', obtenerPublicacionPublicaPorId);
 
 // ---------- CU-05: Revisar Publicación (Área Legal) ----------
 // Van ANTES de '/:id' para que Express no confunda estas rutas con un id

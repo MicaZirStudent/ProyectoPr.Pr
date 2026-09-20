@@ -13,6 +13,7 @@ const CrearPublicacion = () => {
         tipoOperacion: 'venta',
         tipoPropiedad: '',
         precio: '',
+        moneda: 'USD',
         direccion: '',
         superficie: '',
         ambientes: '',
@@ -57,8 +58,13 @@ const CrearPublicacion = () => {
         } catch (error) {
             if (error.response?.status === 401) {
                 navigate('/login');
+                return;
             }
-            setError('Complete todos los campos obligatorios');
+            if (error.response?.status === 413) {
+                setError('Las fotos son demasiado pesadas. Sacá alguna e intentá de nuevo.');
+            } else {
+                setError(error.response?.data?.mensaje || 'Complete todos los campos obligatorios');
+            }
         } finally {
             setGuardando(false);
         }
@@ -134,6 +140,13 @@ const CrearPublicacion = () => {
                                 placeholder="Ej: 150000"
                                 required
                             />
+                        </div>
+                        <div className="field">
+                            <label>Moneda *</label>
+                            <select name="moneda" value={form.moneda} onChange={handleChange}>
+                                <option value="USD">USD</option>
+                                <option value="ARS">ARS</option>
+                            </select>
                         </div>
                     </div>
 

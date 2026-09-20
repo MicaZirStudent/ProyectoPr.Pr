@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Publicacion = require('../../models/publicacion');
 const Observacion = require('../../models/observaciones');
 const Notificacion = require('../../models/notificacion');
@@ -22,6 +23,7 @@ const crearPublicacion = async (req, res) => {
             tipoOperacion,
             tipoPropiedad,
             precio,
+            moneda,
             direccion,
             superficie,
             ambientes,
@@ -40,6 +42,7 @@ const crearPublicacion = async (req, res) => {
             tipo_operacion: tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1),
             tipo_propiedad: tipoPropiedad ? tipoPropiedad.charAt(0).toUpperCase() + tipoPropiedad.slice(1) : undefined,
             precio,
+            moneda: ['USD', 'ARS'].includes(moneda) ? moneda : 'USD',
             direccion,
             superficie,
             ambientes,
@@ -95,7 +98,7 @@ const editarPublicacion = async (req, res) => {
         const { id } = req.params;
         const idUsuario = req.usuario.idUsuario;
 
-        const { titulo, descripcion, tipoOperacion, tipoPropiedad, precio, direccion, superficie, ambientes, imagenes } = req.body;
+        const { titulo, descripcion, tipoOperacion, tipoPropiedad, precio, moneda, direccion, superficie, ambientes, imagenes } = req.body;
 
         if (!titulo || !tipoOperacion || !precio || !direccion) {
             return res.status(400).json({ mensaje: 'Complete todos los campos obligatorios' });
@@ -118,6 +121,7 @@ const editarPublicacion = async (req, res) => {
         publicacion.tipo_operacion = tipoOperacion.charAt(0).toUpperCase() + tipoOperacion.slice(1);
         publicacion.tipo_propiedad = tipoPropiedad ? tipoPropiedad.charAt(0).toUpperCase() + tipoPropiedad.slice(1) : undefined;
         publicacion.precio = precio;
+        publicacion.moneda = ['USD', 'ARS'].includes(moneda) ? moneda : publicacion.moneda;
         publicacion.direccion = direccion;
         publicacion.superficie = superficie;
         publicacion.ambientes = ambientes;
@@ -180,12 +184,20 @@ const enviarARevision = async (req, res) => {
 const OPERACIONES_VALIDAS = ['venta', 'alquiler'];
 const PROPIEDADES_VALIDAS = ['casa', 'departamento', 'local'];
 const AMBIENTES_VALIDOS = ['1', '2', '3', '4', '4+'];
+const MONEDAS_VALIDAS = ['USD', 'ARS'];
 
 const obtenerPublicacionesPublicas = async (req, res) => {
     try {
-        const { tipo_operacion, tipo_propiedad, ambientes, precio_desde, precio_hasta } = req.query;
+        const { tipo_operacion, tipo_propiedad, ambientes, precio_desde, precio_hasta, moneda } = req.query;
 
         const filtro = { estado: 'Publicada' };
+
+        if (moneda) {
+            if (!MONEDAS_VALIDAS.includes(String(moneda).toUpperCase())) {
+                return res.status(400).json({ success: false, mensaje: 'moneda inválida' });
+            }
+            filtro.moneda = String(moneda).toUpperCase();
+        }
 
         if (tipo_operacion) {
             if (!OPERACIONES_VALIDAS.includes(String(tipo_operacion).toLowerCase())) {
@@ -234,6 +246,7 @@ const obtenerPublicacionesPublicas = async (req, res) => {
             tipo_operacion: pub.tipo_operacion,
             tipo_propiedad: pub.tipo_propiedad || null,
             precio: pub.precio,
+            moneda: pub.moneda || 'USD',
             direccion: pub.direccion,
             superficie: pub.superficie,
             ambientes: pub.ambientes,
@@ -246,6 +259,45 @@ const obtenerPublicacionesPublicas = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ success: false, mensaje: 'Error al buscar publicaciones', error: error.message });
+    }
+};
+
+// Ficha pública de una propiedad publicada (sin login) — trae todos los datos, incluidas las fotos
+const obtenerPublicacionPublicaPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(404).json({ success: false, mensaje: 'Propiedad no encontrada' });
+        }
+
+        const pub = await Publicacion.findOne({ _id: id, estado: 'Publicada' })
+            .populate('id_agente', 'nombre apellido');
+
+        if (!pub) {
+            return res.status(404).json({ success: false, mensaje: 'Propiedad no encontrada' });
+        }
+
+        res.json({
+            success: true,
+            propiedad: {
+                _id: pub._id,
+                titulo: pub.titulo,
+                tipo_operacion: pub.tipo_operacion,
+                tipo_propiedad: pub.tipo_propiedad || null,
+                precio: pub.precio,
+                moneda: pub.moneda || 'USD',
+                direccion: pub.direccion,
+                superficie: pub.superficie,
+                ambientes: pub.ambientes,
+                imagenes: pub.imagenes,
+                descripcion: pub.descripcion,
+                agente: pub.id_agente ? `${pub.id_agente.nombre} ${pub.id_agente.apellido}` : null
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, mensaje: 'Error al obtener la propiedad', error: error.message });
     }
 };
 
@@ -402,6 +454,7 @@ module.exports = {
     eliminarPublicacion,
     enviarARevision,
     obtenerPublicacionesPublicas,
+    obtenerPublicacionPublicaPorId,
     obtenerPublicacionesPendientesRevision,
     obtenerHistorialLegal,
     aprobarPublicacion,

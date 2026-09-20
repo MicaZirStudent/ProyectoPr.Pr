@@ -157,6 +157,56 @@
     color: #9ca3af;
 }
 
+.catalogo-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(26, 43, 74, 0.55);
+    color: var(--blanco);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.catalogo-nav:hover:not(:disabled) {
+    background: var(--navy);
+}
+
+.catalogo-nav:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.catalogo-nav-prev {
+    left: 0.6rem;
+}
+
+.catalogo-nav-next {
+    right: 0.6rem;
+}
+
+.catalogo-indicador {
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--blanco);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+}
+
 .catalogo-card-info {
     flex: 1;
     display: flex;

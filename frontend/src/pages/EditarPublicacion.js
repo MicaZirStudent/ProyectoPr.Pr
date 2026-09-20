@@ -14,6 +14,7 @@ const EditarPublicacion = () => {
         tipoOperacion: 'venta',
         tipoPropiedad: '',
         precio: '',
+        moneda: 'USD',
         direccion: '',
         superficie: '',
         ambientes: '',
@@ -44,6 +45,7 @@ const EditarPublicacion = () => {
                 tipoOperacion: (pub.tipo_operacion || 'venta').toLowerCase(),
                 tipoPropiedad: pub.tipo_propiedad ? pub.tipo_propiedad.toLowerCase() : '',
                 precio: pub.precio ?? '',
+                moneda: ['USD', 'ARS'].includes(pub.moneda) ? pub.moneda : 'USD',
                 direccion: pub.direccion,
                 superficie: pub.superficie ?? '',
                 ambientes: pub.ambientes ?? '',
@@ -85,11 +87,16 @@ const EditarPublicacion = () => {
                 navigate('/mis-publicaciones');
             }, 1500);
         } catch (error) {
-            if (error.response?.status === 401) navigate('/login');
+            if (error.response?.status === 401) {
+                navigate('/login');
+                return;
+            }
             if (error.response?.status === 403) {
                 setError('No se puede editar una publicación en este estado');
+            } else if (error.response?.status === 413) {
+                setError('Las fotos son demasiado pesadas. Sacá alguna e intentá de nuevo.');
             } else {
-                setError('Complete todos los campos obligatorios');
+                setError(error.response?.data?.mensaje || 'Complete todos los campos obligatorios');
             }
         } finally {
             setGuardando(false);
@@ -174,6 +181,13 @@ const EditarPublicacion = () => {
                                 placeholder="Ej: 150000"
                                 required
                             />
+                        </div>
+                        <div className="field">
+                            <label>Moneda *</label>
+                            <select name="moneda" value={form.moneda} onChange={handleChange}>
+                                <option value="USD">USD</option>
+                                <option value="ARS">ARS</option>
+                            </select>
                         </div>
                     </div>
 

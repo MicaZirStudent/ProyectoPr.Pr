@@ -14,7 +14,7 @@ const FILTROS_INICIALES = {
     ambientes: '',
     precioDesde: '',
     precioHasta: '',
-    moneda: 'USD'
+    moneda: ''
 };
 
 const formatearPrecio = (precio, moneda) => {
@@ -29,6 +29,15 @@ const Catalogo = () => {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState('');
     const [contactoPub, setContactoPub] = useState(null);
+    const [imagenActual, setImagenActual] = useState({});
+
+    const cambiarImagen = (idPub, delta, totalImagenes) => {
+        setImagenActual((prev) => {
+            const actual = prev[idPub] || 0;
+            const siguiente = Math.min(Math.max(actual + delta, 0), totalImagenes - 1);
+            return { ...prev, [idPub]: siguiente };
+        });
+    };
 
     const buscar = useCallback(async (filtrosActuales) => {
         setCargando(true);
@@ -133,6 +142,7 @@ const Catalogo = () => {
                             min="0"
                         />
                         <select name="moneda" value={filtros.moneda} onChange={handleFiltroChange}>
+                            <option value="">Todas</option>
                             <option value="USD">USD</option>
                             <option value="ARS">ARS</option>
                         </select>
@@ -160,15 +170,43 @@ const Catalogo = () => {
                     <p className="catalogo-vacio">No se encontraron propiedades</p>
                 ) : (
                     <div className="catalogo-lista">
-                        {propiedades.map((pub) => (
+                        {propiedades.map((pub) => {
+                            const imagenes = Array.isArray(pub.imagenes) ? pub.imagenes : [];
+                            const indice = Math.min(imagenActual[pub._id] || 0, Math.max(imagenes.length - 1, 0));
+
+                            return (
                             <article className="catalogo-card" key={pub._id}>
                                 <div className="catalogo-card-media">
-                                    {pub.imagenes && pub.imagenes.length > 0 ? (
-                                        <img src={pub.imagenes[0]} alt={pub.titulo} />
+                                    {imagenes.length > 0 ? (
+                                        <img src={imagenes[indice]} alt={pub.titulo} />
                                     ) : (
                                         <div className="catalogo-card-sinfoto">
                                             <BuildingIcon size={42} stroke={1.5} />
                                         </div>
+                                    )}
+
+                                    {imagenes.length > 1 && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="catalogo-nav catalogo-nav-prev"
+                                                onClick={() => cambiarImagen(pub._id, -1, imagenes.length)}
+                                                disabled={indice === 0}
+                                                aria-label="Imagen anterior"
+                                            >
+                                                ‹
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="catalogo-nav catalogo-nav-next"
+                                                onClick={() => cambiarImagen(pub._id, 1, imagenes.length)}
+                                                disabled={indice === imagenes.length - 1}
+                                                aria-label="Imagen siguiente"
+                                            >
+                                                ›
+                                            </button>
+                                            <span className="catalogo-indicador">{indice + 1}/{imagenes.length}</span>
+                                        </>
                                     )}
                                 </div>
                                 <div className="catalogo-card-info">
@@ -176,7 +214,7 @@ const Catalogo = () => {
                                         <span className="catalogo-badge-operacion">{pub.tipo_operacion}</span>
                                         {pub.tipo_propiedad && <span className="catalogo-badge-tipo">{pub.tipo_propiedad}</span>}
                                     </div>
-                                    <p className="catalogo-card-precio">{formatearPrecio(pub.precio, filtros.moneda)}</p>
+                                    <p className="catalogo-card-precio">{formatearPrecio(pub.precio, pub.moneda)}</p>
                                     <h2 className="catalogo-card-titulo">{pub.titulo}</h2>
                                     <p className="catalogo-card-direccion">{pub.direccion}</p>
                                     <p className="catalogo-card-meta">
@@ -196,7 +234,8 @@ const Catalogo = () => {
                                     </div>
                                 </div>
                             </article>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </main>

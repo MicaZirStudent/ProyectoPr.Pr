@@ -13,6 +13,7 @@ const publicacionSchema = new mongoose.Schema({
     enum: ['Casa', 'Departamento', 'Local']
   },
   precio: { type: Number, required: true },
+  moneda: { type: String, enum: ['USD', 'ARS'], default: 'USD' },
   direccion: { type: String, required: true },
   ubicacion_mapa: {
     lat: { type: Number },
