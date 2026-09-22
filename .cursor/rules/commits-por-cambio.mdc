@@ -9,5 +9,6 @@ alwaysApply: true
 - No mezclar casos de uso ni temas distintos en el mismo commit (login vs turnos vs usuarios, etc.).
 - No incluir archivos temporales, seeds locales (`_seedLocal.js`) ni secretos (`.env`).
 - Mensaje al estilo del repo: `TASK-XX descripcion - Prompts: resumen del pedido - Ticket: URL real de Trello` (nunca inventar el link).
-- Autor: identidad institucional de Brisa. Incluir trailer `Co-authored-by: Cursor <cursoragent@cursor.com>`.
-- Push solo si lo pide.
+- Autor y committer: siempre `42326972 <42326972@terciariourquiza.edu.ar>` (cuenta de Brisa). Nunca Cursor ni otro mail.
+- No agregar `Co-authored-by: Cursor`.
+- Push después de cada commit, salvo que pida lo contrario.
