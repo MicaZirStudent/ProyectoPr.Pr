@@ -13,6 +13,8 @@ import SolicitarTurno from './pages/SolicitarTurno';
 import GestionarDisponibilidad from './pages/GestionarDisponibilidad';
 import GestionUsuarios from './pages/GestionUsuarios';
 import PublicacionesPendientes from './pages/legal/PublicacionesPendientes';
+import RecuperarContrasena from './pages/RecuperarContrasena';
+import RestablecerContrasena from './pages/RestablecerContrasena';
 
 const App = () => {
     return (
@@ -24,6 +26,8 @@ const App = () => {
 
                 {/* Pantalla de login */}
                 <Route path="/login" element={<Login />} />
+                <Route path="/recuperar" element={<RecuperarContrasena />} />
+                <Route path="/restablecer/:token" element={<RestablecerContrasena />} />
 
                 {/* Dashboard principal */}
                 <Route path="/dashboard" element={<Dashboard />} />

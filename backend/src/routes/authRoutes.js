@@ -5,13 +5,12 @@ const express = require('express');
 const router = express.Router();
 
 // Importamos las funciones que escribimos en el controller
-const { registrar, login } = require('../controllers/authController');
+const { registrar, login, solicitarRecuperacion, restablecerContrasena } = require('../controllers/authController');
 
-// Cuando llegue una petición POST a /registrar, ejecutamos la función registrar
 router.post('/registrar', registrar);
-
-// Cuando llegue una petición POST a /login, ejecutamos la función login
 router.post('/login', login);
+router.post('/recuperar', solicitarRecuperacion);
+router.post('/restablecer', restablecerContrasena);
 
 // Exportamos el router para poder usarlo en index.js
 module.exports = router;

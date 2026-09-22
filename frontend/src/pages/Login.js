@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Brand from '../components/Brand';
 import { SquareIcon } from '../components/Icons';
 import './Login.css';
@@ -69,7 +69,7 @@ const Login = () => {
                                 required
                             />
                         </div>
-                        <a className="login-forgot" href="/recuperar">¿Olvidaste tu contraseña?</a>
+                        <Link className="login-forgot" to="/recuperar">¿Olvidaste tu contraseña?</Link>
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Ingresar</button>
                     </form>
                     <button

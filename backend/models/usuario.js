@@ -14,7 +14,10 @@ const usuarioSchema = new mongoose.Schema({
     type: String, 
     default: 'Activo',
     enum: ['Activo', 'Inactivo']
-  }
+  },
+  reset_token: { type: String, default: null },
+  reset_token_expira: { type: Date, default: null },
+  reset_token_usado: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);
