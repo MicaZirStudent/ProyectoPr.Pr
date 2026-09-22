@@ -1,0 +1,13 @@
+---
+description: Cada cambio de código debe ir en un commit propio
+alwaysApply: true
+---
+
+# Commits por cada cambio
+
+- Después de cada cambio de código listo para guardar, hacer un `git commit` sin esperar a que lo pida.
+- No mezclar casos de uso ni temas distintos en el mismo commit (login vs turnos vs usuarios, etc.).
+- No incluir archivos temporales, seeds locales (`_seedLocal.js`) ni secretos (`.env`).
+- Mensaje al estilo del repo: `TASK-XX descripcion - Prompts: resumen del pedido - Ticket: URL real de Trello` (nunca inventar el link).
+- Autor: identidad institucional de Brisa. Incluir trailer `Co-authored-by: Cursor <cursoragent@cursor.com>`.
+- Push solo si lo pide.
