@@ -10,7 +10,8 @@ const notificarAreaLegal = async (mensaje, idPublicacion) => {
     await Notificacion.insertMany(usuariosLegal.map((u) => ({
         mensaje,
         id_usuario_destino: u._id,
-        id_publicacion: idPublicacion
+        id_publicacion: idPublicacion,
+        tipo: 'revision'
     })));
 };
 
@@ -390,7 +391,8 @@ const aprobarPublicacion = async (req, res) => {
         await Notificacion.create({
             mensaje: `¡Tu publicación "${publicacion.titulo}" fue aprobada y ya está visible en el catálogo!`,
             id_usuario_destino: publicacion.id_agente,
-            id_publicacion: publicacion._id
+            id_publicacion: publicacion._id,
+            tipo: 'aprobada'
         });
 
         res.json({ mensaje: 'Publicación aprobada y publicada correctamente' });
@@ -436,7 +438,8 @@ const observarPublicacion = async (req, res) => {
         await Notificacion.create({
             mensaje: `Tu publicación "${publicacion.titulo}" tiene observaciones. Motivo: ${comentarios.trim()}`,
             id_usuario_destino: publicacion.id_agente,
-            id_publicacion: publicacion._id
+            id_publicacion: publicacion._id,
+            tipo: 'observada'
         });
 
         res.json({ mensaje: 'Observación registrada correctamente' });

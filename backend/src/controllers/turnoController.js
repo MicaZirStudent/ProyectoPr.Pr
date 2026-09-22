@@ -230,7 +230,8 @@ const crearTurno = async (req, res) => {
         await Notificacion.create({
             mensaje: `Nuevo turno de ${String(nombre).trim()} el ${fechaTexto} a las ${horaTexto}. Email: ${String(correoElectronico).trim()}. WhatsApp: ${String(telefono).trim()}. Propiedad: ${publicacion.titulo}.`,
             id_usuario_destino: publicacion.id_agente,
-            id_publicacion: publicacion._id
+            id_publicacion: publicacion._id,
+            tipo: 'turno'
         });
 
         res.status(201).json({

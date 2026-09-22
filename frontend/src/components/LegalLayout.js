@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Brand from './Brand';
 import { BuildingIcon } from './Icons';
+import NotificationBell from './NotificationBell';
 import './AgentLayout.css';
 
 const LegalLayout = ({ children, title, subtitle, actions }) => {
@@ -38,6 +39,7 @@ const LegalLayout = ({ children, title, subtitle, actions }) => {
                     <Brand compact />
                 </button>
                 <div className="topbar-user">
+                    <NotificationBell />
                     <div className="topbar-user-text">
                         <span className="topbar-nombre">{usuario?.nombre} {usuario?.apellido}</span>
                         <span className="topbar-rol">{usuario?.rol}</span>

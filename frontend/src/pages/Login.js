@@ -20,6 +20,10 @@ const Login = () => {
             });
             localStorage.setItem('token', respuesta.data.token);
             localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario));
+            sessionStorage.setItem('mostrarAvisosLogin', '1');
+            if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
             if (respuesta.data.usuario?.rol === 'Area legal') {
                 navigate('/legal/publicaciones');
             } else {

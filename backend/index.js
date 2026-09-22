@@ -20,6 +20,7 @@ const publicacionRoutes = require('./src/routes/publicacionRoutes');
 const turnoRoutes = require('./src/routes/turnoRoutes');
 const disponibilidadRoutes = require('./src/routes/disponibilidadRoutes');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
+const notificacionRoutes = require('./src/routes/notificacionRoutes');
 
 // Creamos la aplicación de Express
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/publicaciones', publicacionRoutes);
 app.use('/api/turnos', turnoRoutes);
 app.use('/api/disponibilidad', disponibilidadRoutes);
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/notificaciones', notificacionRoutes);
 
 // Ruta de prueba: si entramos a localhost:3001/ vemos este mensaje
 app.get('/', (req, res) => {

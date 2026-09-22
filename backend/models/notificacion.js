@@ -13,6 +13,10 @@ const notificacionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Publicacion',
     required: false
+  },
+  tipo: {
+    type: String,
+    enum: ['turno', 'revision', 'aprobada', 'observada']
   }
 });
 
