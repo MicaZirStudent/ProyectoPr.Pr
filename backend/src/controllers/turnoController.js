@@ -246,4 +246,144 @@ const crearTurno = async (req, res) => {
     }
 };
 
-module.exports = { obtenerHorariosDisponibles, crearTurno };
+const publicacionesDelUsuario = async (req) => {
+    const filtro = req.usuario.rol === 'Administrador'
+        ? {}
+        : { id_agente: req.usuario.idUsuario };
+    return Publicacion.find(filtro).select('_id titulo direccion');
+};
+
+const serializarTurno = (turno) => {
+    const publicacion = turno.id_publicacion && turno.id_publicacion.titulo
+        ? turno.id_publicacion
+        : null;
+    return {
+        _id: turno._id,
+        nombre_cliente: turno.nombre_cliente,
+        email_cliente: turno.email_cliente,
+        whatsapp_cliente: turno.whatsapp_cliente,
+        fecha: formatearFecha(new Date(turno.fecha)),
+        hora: String(turno.hora).slice(0, 5),
+        estado: turno.estado,
+        id_publicacion: publicacion ? publicacion._id : turno.id_publicacion,
+        publicacion: publicacion
+            ? { titulo: publicacion.titulo, direccion: publicacion.direccion }
+            : null
+    };
+};
+
+const listarMisTurnos = async (req, res) => {
+    try {
+        const publicaciones = await publicacionesDelUsuario(req);
+        const ids = publicaciones.map((p) => p._id);
+        const turnos = await Turno.find({ id_publicacion: { $in: ids } })
+            .populate('id_publicacion', 'titulo direccion')
+            .sort({ fecha: 1, hora: 1 });
+
+        res.json(turnos.map(serializarTurno));
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al listar los turnos', error: error.message });
+    }
+};
+
+const actualizarTurno = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estado, fechaHora, nombre, correoElectronico, telefono } = req.body;
+
+        if (!idEsValido(id)) {
+            return res.status(404).json({ mensaje: 'Turno no encontrado' });
+        }
+
+        const turno = await Turno.findById(id);
+        if (!turno) {
+            return res.status(404).json({ mensaje: 'Turno no encontrado' });
+        }
+
+        const publicacion = await Publicacion.findById(turno.id_publicacion);
+        if (!publicacion) {
+            return res.status(404).json({ mensaje: 'Turno no encontrado' });
+        }
+
+        const esDuenio = String(publicacion.id_agente) === String(req.usuario.idUsuario);
+        if (!esDuenio && req.usuario.rol !== 'Administrador') {
+            return res.status(403).json({ mensaje: 'No tenés permisos para realizar esta acción' });
+        }
+
+        if (estado) {
+            if (!['Pendiente', 'Confirmado', 'Cancelado'].includes(estado)) {
+                return res.status(400).json({ mensaje: 'El estado indicado no es válido' });
+            }
+            turno.estado = estado;
+        }
+
+        if (nombre && String(nombre).trim()) {
+            turno.nombre_cliente = String(nombre).trim();
+        }
+        if (correoElectronico) {
+            if (!emailValido(correoElectronico)) {
+                return res.status(400).json({ mensaje: MENSAJE_EMAIL_TELEFONO });
+            }
+            turno.email_cliente = String(correoElectronico).trim();
+        }
+        if (telefono) {
+            if (!telefonoValido(telefono)) {
+                return res.status(400).json({ mensaje: MENSAJE_EMAIL_TELEFONO });
+            }
+            turno.whatsapp_cliente = String(telefono).trim();
+        }
+
+        if (fechaHora) {
+            const { fechaTexto, horaTexto } = partirFechaHora(fechaHora);
+            if (!fechaTexto || !horaTexto) {
+                return res.status(400).json({ mensaje: MENSAJE_CAMPOS_VACIOS });
+            }
+
+            const fechaActual = formatearFecha(new Date(turno.fecha));
+            const horaActual = String(turno.hora).slice(0, 5);
+            const mismoHorario = fechaActual === fechaTexto && horaActual === horaTexto;
+
+            if (!mismoHorario) {
+                if (esFechaHoraPasada(fechaTexto, horaTexto)) {
+                    return res.status(400).json({ mensaje: MENSAJE_FECHA_PASADA });
+                }
+
+                const disponibilidades = await Disponibilidad.find({ id_publicacion: turno.id_publicacion });
+                const bloque = encontrarBloque(disponibilidades, fechaTexto, horaTexto);
+                if (!bloque) {
+                    return res.status(409).json({ mensaje: MENSAJE_HORARIO_OCUPADO });
+                }
+
+                const conflicto = await Turno.findOne({
+                    _id: { $ne: turno._id },
+                    id_publicacion: turno.id_publicacion,
+                    fecha: fechaDesdeTexto(fechaTexto),
+                    hora: horaTexto,
+                    estado: { $in: ESTADOS_OCUPADOS }
+                });
+                if (conflicto) {
+                    return res.status(409).json({ mensaje: MENSAJE_HORARIO_OCUPADO });
+                }
+
+                turno.fecha = fechaDesdeTexto(fechaTexto);
+                turno.hora = horaTexto;
+                turno.id_disponibilidad = bloque._id;
+            }
+        }
+
+        await turno.save();
+        const actualizado = await Turno.findById(turno._id).populate('id_publicacion', 'titulo direccion');
+
+        res.json({
+            mensaje: 'Turno actualizado correctamente',
+            turno: serializarTurno(actualizado)
+        });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(409).json({ mensaje: MENSAJE_HORARIO_OCUPADO });
+        }
+        res.status(500).json({ mensaje: 'Error al actualizar el turno', error: error.message });
+    }
+};
+
+module.exports = { obtenerHorariosDisponibles, crearTurno, listarMisTurnos, actualizarTurno };

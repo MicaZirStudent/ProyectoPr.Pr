@@ -1,0 +1,107 @@
+.trn-error,
+.trn-exito {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin: 0 0 1rem;
+}
+
+.trn-error {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.trn-exito {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.trn-card {
+    background: #fff;
+    border: 1px solid #DDD8CE;
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.trn-tabla-wrap {
+    overflow-x: auto;
+}
+
+.trn-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.trn-tabla th,
+.trn-tabla td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid #EEEAE3;
+    font-size: 14px;
+    vertical-align: top;
+}
+
+.trn-dir {
+    color: #6B7280;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.trn-estado {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.trn-pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.trn-confirmado {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.trn-cancelado {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.trn-modal-fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 50;
+}
+
+.trn-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: min(640px, 100%);
+}
+
+.trn-modal h2 {
+    margin: 0 0 0.35rem;
+}
+
+.trn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.trn-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}

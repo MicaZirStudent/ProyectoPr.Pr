@@ -7,7 +7,8 @@ import './AgentLayout.css';
 const NAV_ITEMS = [
     { path: '/dashboard', label: 'Inicio', icon: '⌂' },
     { path: '/mis-publicaciones', label: 'Publicaciones', icon: <BuildingIcon size={18} /> },
-    { path: '/crear-publicacion', label: 'Nueva propiedad', icon: '+' }
+    { path: '/crear-publicacion', label: 'Nueva propiedad', icon: '+' },
+    { path: '/mis-turnos', label: 'Mis turnos', icon: '◷' }
 ];
 
 const AgentLayout = ({ children, title, subtitle, actions }) => {
@@ -83,10 +84,6 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
                             {item.label}
                         </button>
                     ))}
-                    <button type="button" className="sidebar-link is-disabled" disabled>
-                        <span className="sidebar-icon">◷</span>
-                        Mis turnos
-                    </button>
                 </nav>
             </aside>
 

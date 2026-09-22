@@ -27,10 +27,10 @@ const Dashboard = () => {
                     <h2>Agregar nueva propiedad</h2>
                     <p>Cargá una nueva propiedad al sistema</p>
                 </div>
-                <div className="dash-card is-static">
+                <div className="dash-card" onClick={() => navigate('/mis-turnos')}>
                     <span className="dash-card-icono">◷</span>
                     <h2>Mis turnos</h2>
-                    <p>Revisá las visitas agendadas</p>
+                    <p>Revisá y editá las visitas agendadas</p>
                 </div>
                 {usuario?.rol === 'Administrador' && (
                     <div className="dash-card" onClick={() => navigate('/gestion-usuarios')}>
