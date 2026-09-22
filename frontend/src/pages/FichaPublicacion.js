@@ -56,6 +56,13 @@ const FichaPublicacion = () => {
     const miniaturas = imagenes.slice(1, 1 + MINIATURAS_VISIBLES);
     const restantes = imagenes.length - 1 - MINIATURAS_VISIBLES;
     const simboloMoneda = publicacion.moneda === 'ARS' ? 'AR$' : 'US$';
+    const direccion = String(publicacion.direccion || '').trim();
+    const mapaEmbed = direccion
+        ? `https://maps.google.com/maps?q=${encodeURIComponent(direccion)}&z=16&output=embed`
+        : '';
+    const mapaEnlace = direccion
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`
+        : '';
 
     return (
         <div className="ficha-wrap">
@@ -104,6 +111,17 @@ const FichaPublicacion = () => {
                             <span>Sin fotos</span>
                         </div>
                     )}
+                    {mapaEmbed && (
+                        <section className="ficha-mapa" aria-label="Ubicación en el mapa">
+                            <h2 className="ficha-seccion-titulo">Ubicación</h2>
+                            <iframe
+                                title={`Mapa de ${publicacion.titulo}`}
+                                src={mapaEmbed}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                        </section>
+                    )}
                 </div>
 
                 <div className="ficha-info">
@@ -117,7 +135,17 @@ const FichaPublicacion = () => {
                     </p>
 
                     <h1 className="ficha-titulo">{publicacion.titulo}</h1>
-                    <p className="ficha-direccion">{publicacion.direccion}</p>
+                    <p className="ficha-direccion">
+                        {direccion}
+                        {mapaEnlace && (
+                            <>
+                                {' · '}
+                                <a className="ficha-maps-link" href={mapaEnlace} target="_blank" rel="noreferrer">
+                                    Abrir en Google Maps
+                                </a>
+                            </>
+                        )}
+                    </p>
 
                     {(publicacion.superficie || publicacion.ambientes) && (
                         <div className="ficha-caracteristicas">
