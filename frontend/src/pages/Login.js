@@ -15,7 +15,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const respuesta = await axios.post('http://localhost:3001/api/auth/login', {
-                email: correo,
+                email: correo.trim().toLowerCase(),
                 password: contraseña
             });
             localStorage.setItem('token', respuesta.data.token);
@@ -26,7 +26,13 @@ const Login = () => {
                 navigate('/dashboard');
             }
         } catch (error) {
-            setError('Usuario o contraseña incorrectos');
+            if (!error.response) {
+                setError('No se pudo conectar con el servidor. ¿Está el backend en marcha?');
+            } else if (error.response.status === 500) {
+                setError('Error del servidor o de la base de datos. Revisá la terminal del backend.');
+            } else {
+                setError('Usuario o contraseña incorrectos');
+            }
         }
     };
 

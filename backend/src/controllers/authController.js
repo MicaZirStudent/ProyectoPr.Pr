@@ -16,7 +16,8 @@ const registrar = async (req, res) => {
             return res.status(400).json({ mensaje: 'Faltan campos obligatorios' });
         }
 
-        const usuarioExistente = await Usuario.findOne({ email });
+        const emailNorm = String(email).trim().toLowerCase();
+        const usuarioExistente = await Usuario.findOne({ email: emailNorm });
         if (usuarioExistente) {
             return res.status(409).json({ mensaje: 'Ya existe un usuario con ese correo' });
         }
@@ -26,7 +27,7 @@ const registrar = async (req, res) => {
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
-            email,
+            email: emailNorm,
             password: passwordHasheada,
             rol
         });
@@ -47,7 +48,10 @@ const login = async (req, res) => {
             return res.status(400).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
-        const usuario = await Usuario.findOne({ email });
+        const emailNorm = String(email).trim().toLowerCase();
+        const usuario = await Usuario.findOne({
+            email: { $regex: new RegExp(`^${emailNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+        });
 
         if (!usuario) {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });

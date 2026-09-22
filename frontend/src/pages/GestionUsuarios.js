@@ -176,11 +176,11 @@ const GestionUsuarios = () => {
                     </div>
                     <div className="field">
                         <label>Correo electrónico *</label>
-                        <input name="email" type="email" value={form.email} onChange={onChange} />
+                        <input name="email" type="email" autoComplete="off" value={form.email} onChange={onChange} />
                     </div>
                     <div className="field">
                         <label>{editandoId ? 'Nueva contraseña (opcional)' : 'Contraseña inicial *'}</label>
-                        <input name="password" type="password" value={form.password} onChange={onChange} />
+                        <input name="password" type="password" autoComplete="new-password" value={form.password} onChange={onChange} />
                     </div>
                     <div className="field">
                         <label>Rol *</label>
