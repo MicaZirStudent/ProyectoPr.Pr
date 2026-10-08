@@ -142,7 +142,7 @@ const SolicitarTurno = () => {
                         {publicacion ? publicacion.titulo : 'Propiedad'}
                     </p>
                 </div>
-                <button type="button" className="btn-volver" onClick={cancelar}>← Volver</button>
+                <button type="button" className="btn btn-ghost btn-back" onClick={cancelar}>Volver</button>
             </div>
 
             <form className="turno-form" onSubmit={handleSubmit}>
@@ -233,10 +233,10 @@ const SolicitarTurno = () => {
                 </div>
 
                 <div className="turno-botones">
-                    <button type="button" className="btn-cancelar" onClick={cancelar}>
+                    <button type="button" className="btn btn-outline" onClick={cancelar}>
                         Cancelar
                     </button>
-                    <button type="submit" className="btn-guardar" disabled={enviando || !!exito}>
+                    <button type="submit" className="btn btn-primary" disabled={enviando || !!exito}>
                         {enviando ? 'Enviando...' : 'Solicitar turno'}
                     </button>
                 </div>

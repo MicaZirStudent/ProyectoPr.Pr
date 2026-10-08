@@ -1,38 +1,45 @@
 .lightbox-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10, 16, 28, 0.92);
+    background: rgba(8, 22, 39, 0.96);
     z-index: 200;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
+    animation: fondo-entrar 0.2s ease both;
 }
 
 .lightbox-cerrar {
     position: absolute;
     top: 1rem;
     right: 1.25rem;
-    background: rgba(255, 255, 255, 0.12);
-    border: none;
-    color: var(--blanco, #fff);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    font-size: 1.6rem;
-    line-height: 1;
+    background: transparent;
+    border: 2px solid rgba(241, 235, 216, 0.5);
+    color: var(--beige-100);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .lightbox-cerrar:hover {
-    background: rgba(255, 255, 255, 0.22);
+    background: var(--beige-100);
+    border-color: var(--beige-100);
+    color: var(--navy-900);
 }
 
 .lightbox-contenido {
     position: relative;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1040px;
     flex: 1;
     display: flex;
     align-items: center;
@@ -44,32 +51,37 @@
     max-width: 100%;
     max-height: 72vh;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    animation: modal-entrar 0.3s ease both;
 }
 
 .lightbox-nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
     border: none;
-    background: rgba(255, 255, 255, 0.14);
-    color: var(--blanco, #fff);
-    font-size: 1.8rem;
-    line-height: 1;
+    background: rgba(241, 235, 216, 0.14);
+    color: var(--beige-100);
     cursor: pointer;
     z-index: 1;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .lightbox-nav:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.28);
+    background: var(--sage-500);
+    color: var(--navy-950);
+    transform: translateY(-50%) scale(1.06);
 }
 
 .lightbox-nav:disabled {
-    opacity: 0.3;
+    opacity: 0.25;
     cursor: not-allowed;
 }
 
@@ -83,14 +95,17 @@
 
 .lightbox-indicador {
     margin-top: 0.85rem;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 0.82rem;
+    color: var(--on-dark-muted);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.08em;
 }
 
 .lightbox-miniaturas {
     display: flex;
     gap: 0.5rem;
-    margin-top: 0.85rem;
+    margin-top: 1rem;
     max-width: 100%;
     overflow-x: auto;
     padding-bottom: 0.25rem;
@@ -98,15 +113,15 @@
 
 .lightbox-miniatura {
     flex: 0 0 auto;
-    width: 64px;
-    height: 48px;
-    border-radius: 6px;
+    width: 72px;
+    height: 52px;
+    border-radius: 8px;
     overflow: hidden;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     padding: 0;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s ease, border-color 0.2s ease;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .lightbox-miniatura img {
@@ -117,12 +132,13 @@
 }
 
 .lightbox-miniatura:hover {
-    opacity: 0.85;
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 .lightbox-miniatura.activa {
     opacity: 1;
-    border-color: var(--gold, #c9a84c);
+    border-color: var(--sage-500);
 }
 
 @media (max-width: 640px) {
@@ -131,8 +147,7 @@
     }
 
     .lightbox-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
+        width: 42px;
+        height: 42px;
     }
 }

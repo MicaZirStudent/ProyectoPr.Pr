@@ -229,13 +229,17 @@ const GestionUsuarios = () => {
                                     <tr key={usuario._id}>
                                         <td>{usuario.nombre}</td>
                                         <td>{usuario.apellido}</td>
-                                        <td>{usuario.rol}</td>
-                                        <td>{usuario.estado}</td>
+                                        <td><span className="usr-rol">{usuario.rol}</span></td>
+                                        <td>
+                                            <span className={`usr-estado ${usuario.estado === 'Inactivo' ? 'is-inactivo' : ''}`}>
+                                                {usuario.estado}
+                                            </span>
+                                        </td>
                                         <td className="usr-acciones">
                                             <button type="button" className="btn btn-soft" onClick={() => empezarEdicion(usuario)}>
                                                 Modificar
                                             </button>
-                                            <button type="button" className="btn btn-outline" onClick={() => setAEliminar(usuario)}>
+                                            <button type="button" className="btn btn-outline btn-eliminar" onClick={() => setAEliminar(usuario)}>
                                                 Eliminar
                                             </button>
                                         </td>
@@ -249,12 +253,12 @@ const GestionUsuarios = () => {
 
             {aEliminar && (
                 <div className="usr-modal-fondo">
-                    <div className="usr-modal">
+                    <div className="usr-modal modal-panel">
                         <p>¿Está seguro que desea eliminar este usuario?</p>
                         <p className="usr-modal-nombre">{aEliminar.nombre} {aEliminar.apellido}</p>
                         <div className="usr-botones">
                             <button type="button" className="btn btn-outline" onClick={() => setAEliminar(null)}>Cancelar</button>
-                            <button type="button" className="btn btn-primary" onClick={confirmarEliminar}>Confirmar</button>
+                            <button type="button" className="btn btn-danger" onClick={confirmarEliminar}>Confirmar</button>
                         </div>
                     </div>
                 </div>

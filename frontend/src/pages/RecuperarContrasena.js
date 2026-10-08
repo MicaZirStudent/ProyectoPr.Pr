@@ -27,9 +27,9 @@ const RecuperarContrasena = () => {
 
     return (
         <div className="login-wrap">
-            <section className="login-panel" style={{ gridColumn: '1 / -1' }}>
+            <section className="login-panel login-panel-solo">
                 <div className="login-card">
-                    <Brand compact />
+                    <Brand compact onLight />
                     <h1 className="login-title">Recuperar contraseña</h1>
                     <p className="login-subtitle">Ingresá el correo de tu cuenta interna</p>
                     {mensaje && <p className="alert alert-ok">{mensaje}</p>}
@@ -49,7 +49,7 @@ const RecuperarContrasena = () => {
                         </button>
                     </form>
                     <p className="login-footer">
-                        <Link to="/login">Volver al inicio de sesión</Link>
+                        <Link className="login-volver" to="/login">Volver al inicio de sesión</Link>
                     </p>
                 </div>
             </section>

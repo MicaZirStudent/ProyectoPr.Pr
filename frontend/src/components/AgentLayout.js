@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Brand from './Brand';
-import { BuildingIcon } from './Icons';
 import NotificationBell from './NotificationBell';
 import './AgentLayout.css';
 
 const NAV_ITEMS = [
-    { path: '/dashboard', label: 'Inicio', icon: '⌂' },
-    { path: '/mis-publicaciones', label: 'Publicaciones', icon: <BuildingIcon size={18} /> },
-    { path: '/crear-publicacion', label: 'Nueva propiedad', icon: '+' },
-    { path: '/mis-turnos', label: 'Mis turnos', icon: '◷' }
+    { path: '/dashboard', label: 'Inicio' },
+    { path: '/mis-publicaciones', label: 'Publicaciones' },
+    { path: '/crear-publicacion', label: 'Nueva propiedad' },
+    { path: '/mis-turnos', label: 'Mis turnos' }
 ];
 
 const AgentLayout = ({ children, title, subtitle, actions }) => {
@@ -25,7 +24,7 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
     };
 
     const navItems = usuario?.rol === 'Administrador'
-        ? [...NAV_ITEMS, { path: '/gestion-usuarios', label: 'Usuarios', icon: '👤' }]
+        ? [...NAV_ITEMS, { path: '/gestion-usuarios', label: 'Usuarios' }]
         : NAV_ITEMS;
 
     const irA = (path) => {
@@ -47,11 +46,11 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
             <nav className="topbar">
                 <button
                     type="button"
-                    className="topbar-menu"
+                    className={`topbar-menu ${menuAbierto ? 'is-open' : ''}`}
                     onClick={() => setMenuAbierto((v) => !v)}
-                    aria-label="Abrir menú"
+                    aria-expanded={menuAbierto}
                 >
-                    ☰
+                    {menuAbierto ? 'Cerrar' : 'Menú'}
                 </button>
                 <button type="button" className="topbar-brand" onClick={() => irA('/dashboard')}>
                     <Brand compact />
@@ -75,18 +74,19 @@ const AgentLayout = ({ children, title, subtitle, actions }) => {
             <aside className={`sidebar ${menuAbierto ? 'is-open' : ''}`}>
                 <p className="sidebar-label">Panel del agente</p>
                 <nav className="sidebar-nav">
-                    {navItems.map((item) => (
+                    {navItems.map((item, index) => (
                         <button
                             key={item.path}
                             type="button"
                             className={`sidebar-link ${activo(item.path) ? 'is-active' : ''}`}
                             onClick={() => irA(item.path)}
                         >
-                            <span className="sidebar-icon">{item.icon}</span>
-                            {item.label}
+                            <span className="sidebar-num">{String(index + 1).padStart(2, '0')}</span>
+                            <span className="sidebar-text">{item.label}</span>
                         </button>
                     ))}
                 </nav>
+                <div className="sidebar-pie" aria-hidden="true" />
             </aside>
 
             <div className="app-body">

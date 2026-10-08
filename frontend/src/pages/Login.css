@@ -1,116 +1,171 @@
 .login-wrap {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    background: var(--navy-deep);
+    grid-template-columns: 1.15fr 0.85fr;
+    background: var(--navy-900);
 }
+
+/* ---------- Lado azul con el logo ---------- */
 
 .login-hero {
     position: relative;
-    padding: 3rem;
+    padding: 3rem 3.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 2rem;
     background:
-        radial-gradient(circle at 20% 20%, rgba(201, 168, 76, 0.18), transparent 40%),
-        linear-gradient(160deg, #1a2b4a 0%, #121c32 100%);
+        radial-gradient(700px 420px at 15% 10%, rgba(41, 86, 127, 0.7), transparent 65%),
+        linear-gradient(165deg, var(--navy-800) 0%, var(--navy-950) 100%);
     overflow: hidden;
 }
 
+/* Techo gigante del logo cruzando el fondo */
 .login-hero::after {
     content: '';
     position: absolute;
-    right: -80px;
-    bottom: -80px;
-    width: 280px;
-    height: 280px;
-    border: 1px solid rgba(201, 168, 76, 0.28);
-    border-radius: 50%;
+    right: -12%;
+    bottom: -6%;
+    width: 75%;
+    aspect-ratio: 2 / 1;
+    background: var(--techo) center / contain no-repeat;
+    opacity: 0.16;
+    pointer-events: none;
 }
 
-.login-hero-mark {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(145deg, var(--gold), var(--gold-dark));
-    color: var(--navy);
-    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.35);
+.login-hero-logo {
+    width: min(260px, 60%);
+    height: auto;
+    position: relative;
     z-index: 1;
+    animation: aparecer 0.6s ease both;
+}
+
+.login-hero-copy {
+    position: relative;
+    z-index: 1;
+    animation: aparecer 0.6s 0.1s ease both;
+}
+
+.login-hero-kicker {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--sage-500);
 }
 
 .login-hero-copy h2 {
-    color: var(--blanco);
-    font-size: clamp(2.2rem, 4vw, 3.4rem);
-    margin: 2.5rem 0 0.75rem;
+    color: var(--beige-100);
+    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+    font-weight: 900;
+    margin: 0 0 1rem;
     max-width: 12ch;
-    line-height: 1.05;
+    line-height: 1.02;
 }
 
-.login-hero-copy p {
-    color: rgba(255, 255, 255, 0.7);
-    max-width: 36ch;
+.login-hero-copy p:last-child {
+    color: var(--on-dark-muted);
+    max-width: 38ch;
+    font-size: 1.08rem;
     line-height: 1.6;
+    margin: 0;
 }
+
+/* ---------- Panel del formulario ---------- */
 
 .login-panel {
-    background: var(--blanco);
+    background: var(--beige-100);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2.5rem 1.5rem;
+    padding: 2.5rem 1.75rem;
+    border-left: 6px solid var(--sage-500);
+}
+
+/* Recuperar / restablecer: tarjeta beige flotando sobre azul */
+.login-panel-solo {
+    grid-column: 1 / -1;
+    border-left: none;
+    background:
+        var(--techo-tenue) 50% 108% / min(900px, 120%) no-repeat,
+        radial-gradient(800px 500px at 50% 0%, rgba(41, 86, 127, 0.6), transparent 70%),
+        var(--navy-900);
+}
+
+.login-panel-solo .login-card {
+    background: var(--beige-50);
+    padding: 2.25rem 2rem;
+    border-radius: var(--radius);
+    border-top: 6px solid var(--sage-500);
+    box-shadow: var(--sombra);
 }
 
 .login-card {
     width: 100%;
-    max-width: 400px;
-}
-
-.login-card .brand .brand-name,
-.login-card .brand .brand-tag {
-    color: var(--navy);
-}
-
-.login-card .brand .brand-tag {
-    color: var(--gold-dark);
+    max-width: 420px;
+    animation: aparecer 0.5s ease both;
 }
 
 .login-card .brand {
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
 }
 
 .login-title {
-    margin: 0 0 0.3rem;
-    font-size: 2rem;
+    margin: 0 0 0.35rem;
+    font-size: 2.3rem;
+    font-weight: 900;
+    color: var(--navy-800);
 }
 
 .login-subtitle {
-    margin: 0 0 1.5rem;
-    color: var(--muted);
-    font-size: 0.92rem;
+    margin: 0 0 1.75rem;
+    color: var(--ink-soft);
+    font-size: 1rem;
 }
 
 .login-forgot {
-    display: block;
-    text-align: right;
-    font-size: 0.82rem;
-    color: var(--gold-dark);
+    display: inline-block;
+    float: right;
+    font-size: 0.88rem;
+    color: var(--navy-700);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     margin: -0.35rem 0 1.25rem;
+    background: linear-gradient(var(--sage-500), var(--sage-500)) left bottom / 0 2px no-repeat;
+    transition: background-size 0.3s ease;
 }
 
 .login-forgot:hover {
-    text-decoration: underline;
+    background-size: 100% 2px;
+}
+
+.login-card form .btn-primary {
+    clear: both;
+    padding: 0.9rem 1.25rem;
+    font-size: 1rem;
 }
 
 .login-footer {
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    margin: 1.25rem 0 0;
+    margin: 1.5rem 0 0;
+}
+
+.login-volver {
+    color: var(--navy-700);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px solid var(--sage-500);
+    padding-bottom: 2px;
+    transition: color 0.2s;
+}
+
+.login-volver:hover {
+    color: var(--sage-700);
 }
 
 @media (max-width: 860px) {
@@ -119,13 +174,26 @@
     }
 
     .login-hero {
-        min-height: 220px;
-        padding: 1.5rem;
+        padding: 1.75rem 1.5rem 2rem;
+        gap: 1.25rem;
+    }
+
+    .login-hero-logo {
+        width: 150px;
     }
 
     .login-hero-copy h2 {
-        margin-top: 1rem;
-        font-size: 2rem;
+        font-size: 2.2rem;
         max-width: none;
+    }
+
+    .login-panel {
+        border-left: none;
+        border-top: 6px solid var(--sage-500);
+    }
+
+    .login-panel-solo {
+        border-top: none;
+        min-height: 100vh;
     }
 }

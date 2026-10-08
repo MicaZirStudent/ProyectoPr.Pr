@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import Brand from '../components/Brand';
-import { SquareIcon } from '../components/Icons';
+import logoLight from '../assets/brand/solution-logo-light.png';
 import './Login.css';
 
 const Login = () => {
@@ -43,18 +43,17 @@ const Login = () => {
     return (
         <div className="login-wrap">
             <section className="login-hero">
-                <span className="login-hero-mark" aria-hidden="true">
-                    <SquareIcon size={28} stroke={1.7} />
-                </span>
+                <img className="login-hero-logo" src={logoLight} alt="SOLUTION" />
                 <div className="login-hero-copy">
-                    <h2>Gestión de Propiedades</h2>
-                    <p>Accedé al panel interno de SOLUTION para administrar publicaciones, revisiones y visitas.</p>
+                    <p className="login-hero-kicker">Panel interno</p>
+                    <h2>Cada propiedad, bajo control.</h2>
+                    <p>Publicaciones, revisiones legales y visitas en un solo lugar.</p>
                 </div>
             </section>
 
             <section className="login-panel">
                 <div className="login-card">
-                    <Brand compact />
+                    <Brand compact onLight />
                     <h1 className="login-title">Iniciar sesión</h1>
                     <p className="login-subtitle">Ingresá con tu cuenta institucional</p>
                     {error && <p className="alert alert-error">{error}</p>}
@@ -84,11 +83,11 @@ const Login = () => {
                     </form>
                     <button
                         type="button"
-                        className="btn btn-outline"
+                        className="btn btn-outline btn-back"
                         style={{ width: '100%', marginTop: '0.9rem' }}
                         onClick={() => navigate('/')}
                     >
-                        ← Volver al catálogo
+                        Volver al catálogo
                     </button>
                     <p className="login-footer">Sistema de gestión inmobiliaria — uso interno</p>
                 </div>

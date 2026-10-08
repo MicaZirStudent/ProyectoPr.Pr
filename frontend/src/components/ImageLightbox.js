@@ -18,7 +18,7 @@ const ImageLightbox = ({ imagenes, indiceInicial = 0, onClose }) => {
 
     return (
         <div className="lightbox-overlay" onClick={onClose}>
-            <button type="button" className="lightbox-cerrar" onClick={onClose} aria-label="Cerrar">×</button>
+            <button type="button" className="lightbox-cerrar" onClick={onClose}>Cerrar</button>
 
             <div className="lightbox-contenido" onClick={(e) => e.stopPropagation()}>
                 <button
@@ -28,7 +28,7 @@ const ImageLightbox = ({ imagenes, indiceInicial = 0, onClose }) => {
                     disabled={indice === 0}
                     aria-label="Imagen anterior"
                 >
-                    ‹
+                    <span className="chevron chevron-izq" />
                 </button>
 
                 <img className="lightbox-img" src={imagenes[indice]} alt={`Foto ${indice + 1} de ${imagenes.length}`} />
@@ -40,7 +40,7 @@ const ImageLightbox = ({ imagenes, indiceInicial = 0, onClose }) => {
                     disabled={indice === imagenes.length - 1}
                     aria-label="Imagen siguiente"
                 >
-                    ›
+                    <span className="chevron" />
                 </button>
             </div>
 

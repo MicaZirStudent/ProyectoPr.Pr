@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LegalLayout from '../../components/LegalLayout';
+import SinFoto from '../../components/SinFoto';
 import './PublicacionesPendientes.css';
 
 const TABS = [
@@ -147,7 +148,7 @@ const PublicacionesPendientes = () => {
                                 {pub.imagenes && pub.imagenes.length > 0 ? (
                                     <img src={pub.imagenes[0]} alt={pub.titulo} />
                                 ) : (
-                                    <div className="legal-card-sinfoto">Sin foto</div>
+                                    <SinFoto />
                                 )}
                             </div>
                             <div className="legal-card-info">
@@ -199,7 +200,7 @@ const PublicacionesPendientes = () => {
 
             {pubObservar && (
                 <div className="legal-modal-overlay" onClick={cerrarObservar}>
-                    <div className="legal-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="legal-modal modal-panel" onClick={(e) => e.stopPropagation()}>
                         <h2 className="legal-titulo">Agregar observaciones</h2>
                         <p className="legal-subtitulo">{pubObservar.titulo}</p>
                         <form onSubmit={enviarObservacion}>
@@ -226,7 +227,7 @@ const PublicacionesPendientes = () => {
 
             {pubComentarios && (
                 <div className="legal-modal-overlay" onClick={() => setPubComentarios(null)}>
-                    <div className="legal-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="legal-modal modal-panel" onClick={(e) => e.stopPropagation()}>
                         <h2 className="legal-titulo">Comentarios</h2>
                         <p className="legal-subtitulo">{pubComentarios.titulo}</p>
                         <p className="legal-card-comentarios-completo">{pubComentarios.comentarios_legal}</p>

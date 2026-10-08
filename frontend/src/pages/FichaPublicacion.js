@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Brand from '../components/Brand';
-import { BuildingIcon } from '../components/Icons';
+import SinFoto from '../components/SinFoto';
 import ImageLightbox from '../components/ImageLightbox';
 import './FichaPublicacion.css';
 
@@ -47,7 +47,12 @@ const FichaPublicacion = () => {
     if (error || !publicacion) {
         return (
             <div className="ficha-wrap">
-                <p className="ficha-error">{error || 'Propiedad no encontrada'}</p>
+                <div className="ficha-error">
+                    <p>{error || 'Propiedad no encontrada'}</p>
+                    <button type="button" className="btn btn-primary btn-back" onClick={() => navigate('/')}>
+                        Volver al catálogo
+                    </button>
+                </div>
             </div>
         );
     }
@@ -70,8 +75,8 @@ const FichaPublicacion = () => {
                 <button type="button" className="ficha-brand" onClick={() => navigate('/')}>
                     <Brand compact />
                 </button>
-                <button type="button" className="btn btn-ghost" onClick={() => navigate('/')}>
-                    ← Volver al catálogo
+                <button type="button" className="btn btn-ghost btn-back" onClick={() => navigate('/')}>
+                    Volver al catálogo
                 </button>
             </header>
 
@@ -107,8 +112,7 @@ const FichaPublicacion = () => {
                         </>
                     ) : (
                         <div className="ficha-sin-foto">
-                            <BuildingIcon size={54} stroke={1.4} />
-                            <span>Sin fotos</span>
+                            <SinFoto />
                         </div>
                     )}
                     {mapaEmbed && (

@@ -1,33 +1,37 @@
 .disp-error,
 .disp-exito {
     max-width: 960px;
-    font-size: 13px;
-    padding: 10px 12px;
-    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    border-left: 5px solid currentColor;
     margin: 0 0 1rem;
 }
 
 .disp-error {
-    background-color: #FEE2E2;
-    color: #B91C1C;
+    background: var(--danger-bg);
+    color: #8f2c1d;
 }
 
 .disp-exito {
-    background-color: #D1FAE5;
-    color: #065F46;
+    background: var(--ok-bg);
+    color: var(--sage-700);
 }
 
 .disp-ayuda {
-    color: #6B7280;
-    font-size: 14px;
-    margin: 0 0 1rem;
+    color: var(--on-dark-muted);
+    font-size: 1rem;
+    margin: 0 0 1.1rem;
 }
 
 .disp-tabla-wrap {
     overflow-x: auto;
-    background: #ffffff;
-    border: 1px solid #DDD8CE;
-    border-radius: 16px;
+    background: var(--beige-50);
+    border-radius: var(--radius);
+    border-top: 5px solid var(--sage-500);
+    box-shadow: var(--sombra);
+    animation: aparecer 0.45s ease both;
 }
 
 .disp-tabla {
@@ -38,39 +42,81 @@
 
 .disp-tabla th,
 .disp-tabla td {
-    padding: 10px 8px;
+    padding: 0.55rem 0.5rem;
     text-align: center;
-    border-bottom: 1px solid #EEEAE3;
-    font-size: 13px;
+    border-bottom: 1px solid var(--beige-200);
+    font-size: 0.9rem;
 }
 
 .disp-tabla th {
-    color: #0D1B2A;
-    font-weight: 600;
+    padding-top: 1rem;
+    padding-bottom: 0.8rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy-700);
 }
 
 .disp-tabla td:first-child,
 .disp-tabla th:first-child {
     text-align: left;
-    padding-left: 16px;
+    padding-left: 1.1rem;
     white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--navy-800);
 }
 
+.disp-tabla tbody tr:hover {
+    background: #fff;
+}
+
+/* Casillero de horario: interruptor que se rellena de verde */
 .disp-slot {
-    min-width: 52px;
-    border: 1.5px solid #DDD8CE;
-    background: #FDFBF7;
-    color: #9CA3AF;
+    position: relative;
+    width: 100%;
+    min-width: 64px;
+    border: 2px solid var(--beige-300);
+    background: #fff;
+    color: var(--muted);
     border-radius: 8px;
-    padding: 6px 8px;
+    padding: 0.5rem 0.4rem;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.disp-slot:hover {
+    border-color: var(--sage-500);
+    color: var(--sage-700);
+    transform: translateY(-2px);
+}
+
+.disp-slot:active {
+    transform: scale(0.95);
 }
 
 .disp-slot.activo {
-    background: #2D6A4F;
-    border-color: #2D6A4F;
-    color: #ffffff;
+    background: var(--sage-500);
+    border-color: var(--sage-500);
+    color: var(--navy-950);
+    animation: disp-marcar 0.3s ease;
+}
+
+.disp-slot.activo:hover {
+    background: var(--sage-600);
+    border-color: var(--sage-600);
+    color: #fff;
+}
+
+@keyframes disp-marcar {
+    50% { transform: scale(1.08); }
 }
 
 .disp-acciones {
@@ -78,10 +124,19 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    margin-top: 1.25rem;
+    margin-top: 1.4rem;
+    flex-wrap: wrap;
 }
 
 .disp-contador {
-    font-size: 13px;
-    color: #6B7280;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--beige-100);
+}
+
+.disp-acciones .btn-primary {
+    min-width: 160px;
+    padding: 0.85rem 1.4rem;
+    font-size: 1rem;
 }

@@ -178,7 +178,7 @@ const MisTurnos = () => {
 
             {editando && (
                 <div className="trn-modal-fondo">
-                    <form className="trn-modal" onSubmit={guardar}>
+                    <form className="trn-modal modal-panel" onSubmit={guardar}>
                         <h2>Editar turno</h2>
                         <p className="trn-dir">{editando.publicacion?.titulo}</p>
                         <div className="trn-grid">

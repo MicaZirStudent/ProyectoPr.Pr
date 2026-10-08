@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Brand from '../components/Brand';
-import { BuildingIcon } from '../components/Icons';
+import SinFoto from '../components/SinFoto';
 import ModalContacto from '../components/ModalContacto';
 import './Catalogo.css';
 
@@ -86,11 +86,23 @@ const Catalogo = () => {
     return (
         <div className="catalogo-wrap">
             <header className="catalogo-header">
-                <Brand compact />
+                <button type="button" className="catalogo-brand" onClick={() => navigate('/')}>
+                    <Brand compact />
+                </button>
                 <button type="button" className="btn btn-ghost" onClick={() => navigate('/login')}>
                     Iniciar sesión
                 </button>
             </header>
+
+            <section className="catalogo-hero">
+                <p className="catalogo-hero-kicker">Propiedades en venta y alquiler</p>
+                <h1>Encontrá el lugar <span>que estás buscando.</span></h1>
+                <p className="catalogo-hero-texto">
+                    {cargando
+                        ? 'Buscando propiedades disponibles…'
+                        : `${propiedades.length} ${propiedades.length === 1 ? 'propiedad disponible' : 'propiedades disponibles'} con visita coordinada por nuestros agentes.`}
+                </p>
+            </section>
 
             <form className="catalogo-filtros" onSubmit={handleBuscar}>
                 <div className="catalogo-campo">
@@ -180,9 +192,7 @@ const Catalogo = () => {
                                     {imagenes.length > 0 ? (
                                         <img src={imagenes[indice]} alt={pub.titulo} />
                                     ) : (
-                                        <div className="catalogo-card-sinfoto">
-                                            <BuildingIcon size={42} stroke={1.5} />
-                                        </div>
+                                        <SinFoto />
                                     )}
 
                                     {imagenes.length > 1 && (
@@ -194,7 +204,7 @@ const Catalogo = () => {
                                                 disabled={indice === 0}
                                                 aria-label="Imagen anterior"
                                             >
-                                                ‹
+                                                <span className="chevron chevron-izq" />
                                             </button>
                                             <button
                                                 type="button"
@@ -203,7 +213,7 @@ const Catalogo = () => {
                                                 disabled={indice === imagenes.length - 1}
                                                 aria-label="Imagen siguiente"
                                             >
-                                                ›
+                                                <span className="chevron" />
                                             </button>
                                             <span className="catalogo-indicador">{indice + 1}/{imagenes.length}</span>
                                         </>

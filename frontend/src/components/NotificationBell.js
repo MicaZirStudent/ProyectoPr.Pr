@@ -3,17 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './NotificationBell.css';
 
-const destinoDeTipo = (tipo, mensaje) => {
-    const texto = `${tipo || ''} ${mensaje || ''}`.toLowerCase();
-    if (texto.includes('turno')) return '/mis-turnos';
-    if (texto.includes('revision') || texto.includes('revisión')) return '/legal/publicaciones';
+// Las notificaciones viejas no tienen "tipo": lo deducimos del mensaje
+const tipoDe = (item) => {
+    if (item.tipo) return item.tipo;
+    const texto = String(item.mensaje || '').toLowerCase();
+    if (texto.includes('turno')) return 'turno';
+    if (texto.includes('aprobada')) return 'aprobada';
+    if (texto.includes('observaciones')) return 'observada';
+    if (texto.includes('revision') || texto.includes('revisión')) return 'revision';
+    return 'aviso';
+};
+
+const ETIQUETAS = {
+    turno: 'Turno',
+    revision: 'Revisión',
+    aprobada: 'Aprobada',
+    observada: 'Observada',
+    aviso: 'Aviso'
+};
+
+const destinoDeTipo = (tipo) => {
+    if (tipo === 'turno') return '/mis-turnos';
+    if (tipo === 'revision') return '/legal/publicaciones';
     return '/mis-publicaciones';
 };
 
+const formatearFecha = (fecha) => (fecha
+    ? new Date(fecha).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })
+    : '');
+
 const resumenPendientes = (pendientes) => {
-    const texto = pendientes.map((n) => `${n.tipo || ''} ${n.mensaje || ''}`).join(' ').toLowerCase();
-    const hayTurno = texto.includes('turno');
-    const hayRevision = texto.includes('revision') || texto.includes('revisión');
+    const tipos = pendientes.map(tipoDe);
+    const hayTurno = tipos.includes('turno');
+    const hayRevision = tipos.includes('revision');
     if (hayTurno && hayRevision) {
         return 'Hay turnos nuevos y publicaciones pendientes de revisión.';
     }
@@ -53,12 +75,36 @@ const emitirAvisoNavegador = (titulo, cuerpo) => {
     }
 };
 
+const ItemNotificacion = ({ item, esNueva, onAbrir }) => {
+    const tipo = tipoDe(item);
+    return (
+        <li>
+            <button
+                type="button"
+                className={`notif-item notif-${tipo} ${esNueva ? 'is-nueva' : ''}`}
+                onClick={() => onAbrir(item)}
+            >
+                <span className="notif-item-head">
+                    <span className="notif-tipo">{ETIQUETAS[tipo]}</span>
+                    {esNueva && <span className="notif-nueva">Nueva</span>}
+                    <small>{formatearFecha(item.fecha)}</small>
+                </span>
+                <span className="notif-mensaje">{item.mensaje}</span>
+                <span className="notif-ir">Ver detalle</span>
+            </button>
+        </li>
+    );
+};
+
 const NotificationBell = () => {
     const navigate = useNavigate();
     const [abierto, setAbierto] = useState(false);
     const [avisoLogin, setAvisoLogin] = useState(false);
     const [avisoExtra, setAvisoExtra] = useState('');
     const [items, setItems] = useState([]);
+    // Ids que estaban sin leer al momento de abrir: se resaltan aunque ya se marcaron como leídas
+    const [recienLeidas, setRecienLeidas] = useState([]);
+    const [itemsLogin, setItemsLogin] = useState([]);
     const caja = useRef(null);
 
     const auth = () => ({
@@ -78,6 +124,18 @@ const NotificationBell = () => {
         }
     };
 
+    // Abrir las notificaciones = leerlas: se marcan en el servidor y se actualiza el contador
+    const marcarComoLeidas = async (lista) => {
+        const ids = lista.filter((n) => !n.leida).map((n) => n._id);
+        if (ids.length === 0) return;
+        setItems((prev) => prev.map((n) => (ids.includes(n._id) ? { ...n, leida: true } : n)));
+        try {
+            await axios.patch('http://localhost:3001/api/notificaciones/leer-todas', {}, auth());
+        } catch {
+            /* si falla, el próximo refresco vuelve a traer el estado real */
+        }
+    };
+
     useEffect(() => {
         const iniciar = async () => {
             const lista = await cargar();
@@ -87,15 +145,18 @@ const NotificationBell = () => {
                 const pendientesLogin = lista.filter((n) => !n.leida);
                 if (pendientesLogin.length > 0) {
                     const resumen = resumenPendientes(pendientesLogin);
+                    setItemsLogin(pendientesLogin);
                     setAvisoLogin(true);
                     setAvisoExtra(resumen);
                     emitirAvisoNavegador('SOLUTION — aviso', resumen);
+                    marcarComoLeidas(pendientesLogin);
                 }
             }
         };
         iniciar();
         const id = setInterval(cargar, 20000);
         return () => clearInterval(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -105,8 +166,15 @@ const NotificationBell = () => {
                 setAbierto(false);
             }
         };
+        const conEscape = (e) => {
+            if (e.key === 'Escape') setAbierto(false);
+        };
         document.addEventListener('mousedown', cerrar);
-        return () => document.removeEventListener('mousedown', cerrar);
+        document.addEventListener('keydown', conEscape);
+        return () => {
+            document.removeEventListener('mousedown', cerrar);
+            document.removeEventListener('keydown', conEscape);
+        };
     }, [avisoLogin]);
 
     useEffect(() => {
@@ -118,84 +186,74 @@ const NotificationBell = () => {
     }, [avisoExtra]);
 
     const noLeidas = items.filter((n) => !n.leida).length;
-    const pendientes = items.filter((n) => !n.leida);
+
+    const alternarPanel = () => {
+        if (abierto) {
+            setAbierto(false);
+            return;
+        }
+        setRecienLeidas(items.filter((n) => !n.leida).map((n) => n._id));
+        setAbierto(true);
+        marcarComoLeidas(items);
+    };
 
     const abrirUna = async (item) => {
-        try {
-            if (!item.leida) {
+        if (!item.leida) {
+            setItems((prev) => prev.map((n) => (n._id === item._id ? { ...n, leida: true } : n)));
+            try {
                 await axios.patch(`http://localhost:3001/api/notificaciones/${item._id}/leer`, {}, auth());
-                setItems((prev) => prev.map((n) => (n._id === item._id ? { ...n, leida: true } : n)));
+            } catch {
+                /* igual navegamos */
             }
-        } catch {
-            /* igual navegamos */
         }
         setAvisoLogin(false);
         setAvisoExtra('');
         setAbierto(false);
-        navigate(destinoDeTipo(item.tipo, item.mensaje));
-    };
-
-    const leerTodas = async () => {
-        try {
-            await axios.patch('http://localhost:3001/api/notificaciones/leer-todas', {}, auth());
-            setItems((prev) => prev.map((n) => ({ ...n, leida: true })));
-        } catch {
-            /* noop */
-        }
+        navigate(destinoDeTipo(tipoDe(item)));
     };
 
     return (
         <div className="notif" ref={caja}>
             <button
                 type="button"
-                className="notif-btn"
-                onClick={() => setAbierto((v) => !v)}
-                aria-label="Notificaciones"
+                className={`notif-btn ${noLeidas > 0 ? 'tiene-nuevas' : ''} ${abierto ? 'is-open' : ''}`}
+                onClick={alternarPanel}
+                aria-expanded={abierto}
+                aria-label={noLeidas > 0 ? `Avisos, ${noLeidas} sin leer` : 'Avisos'}
             >
-                🔔
-                {noLeidas > 0 && <span className="notif-badge">{noLeidas > 9 ? '9+' : noLeidas}</span>}
+                <span>Avisos</span>
+                <span className="notif-badge">{noLeidas > 9 ? '9+' : noLeidas}</span>
             </button>
             {abierto && !avisoLogin && (
-                <div className="notif-panel">
+                <div className="notif-panel" role="dialog" aria-label="Avisos">
                     <div className="notif-panel-head">
-                        <strong>Notificaciones</strong>
-                        {noLeidas > 0 && (
-                            <button type="button" className="notif-leer" onClick={leerTodas}>
-                                Marcar leídas
-                            </button>
-                        )}
+                        <strong>Avisos</strong>
+                        <span>
+                            {recienLeidas.length > 0
+                                ? `${recienLeidas.length} nuevo${recienLeidas.length === 1 ? '' : 's'}`
+                                : 'Todo al día'}
+                        </span>
                     </div>
                     {items.length === 0 ? (
                         <p className="notif-vacio">No hay avisos por ahora</p>
                     ) : (
                         <ul className="notif-lista">
                             {items.map((item) => (
-                                <li key={item._id}>
-                                    <button
-                                        type="button"
-                                        className={`notif-item ${item.leida ? '' : 'is-nueva'}`}
-                                        onClick={() => abrirUna(item)}
-                                    >
-                                        <span>{item.mensaje}</span>
-                                        <small>
-                                            {item.fecha
-                                                ? new Date(item.fecha).toLocaleString('es-AR', {
-                                                    dateStyle: 'short',
-                                                    timeStyle: 'short'
-                                                })
-                                                : ''}
-                                        </small>
-                                    </button>
-                                </li>
+                                <ItemNotificacion
+                                    key={item._id}
+                                    item={item}
+                                    esNueva={recienLeidas.includes(item._id) || !item.leida}
+                                    onAbrir={abrirUna}
+                                />
                             ))}
                         </ul>
                     )}
                 </div>
             )}
 
-            {avisoExtra && (
+            {avisoExtra && !avisoLogin && (
                 <div className="notif-toast" role="status">
-                    <strong>¡Atención!</strong>
+                    <strong>Atención</strong>
                     <span>{avisoExtra}</span>
                     <button type="button" className="notif-toast-cerrar" onClick={() => setAvisoExtra('')}>
                         Cerrar
@@ -205,37 +263,25 @@ const NotificationBell = () => {
 
             {avisoLogin && (
                 <div className="notif-modal-fondo" role="dialog" aria-labelledby="notif-modal-titulo">
-                    <div className="notif-modal">
-                        <h2 id="notif-modal-titulo">Tenés avisos pendientes</h2>
+                    <div className="notif-modal modal-panel">
+                        <h2 id="notif-modal-titulo">Tenés avisos nuevos</h2>
                         <p className="notif-modal-intro">
-                            {pendientes.length === 1
-                                ? 'Hay 1 notificación nueva al ingresar.'
-                                : `Hay ${pendientes.length} notificaciones nuevas al ingresar.`}
+                            {itemsLogin.length === 1
+                                ? 'Llegó 1 notificación mientras no estabas.'
+                                : `Llegaron ${itemsLogin.length} notificaciones mientras no estabas.`}
                         </p>
                         <ul className="notif-lista">
-                            {pendientes.map((item) => (
-                                <li key={item._id}>
-                                    <button
-                                        type="button"
-                                        className="notif-item is-nueva"
-                                        onClick={() => abrirUna(item)}
-                                    >
-                                        <span>{item.mensaje}</span>
-                                        <small>
-                                            {item.fecha
-                                                ? new Date(item.fecha).toLocaleString('es-AR', {
-                                                    dateStyle: 'short',
-                                                    timeStyle: 'short'
-                                                })
-                                                : ''}
-                                        </small>
-                                    </button>
-                                </li>
+                            {itemsLogin.map((item) => (
+                                <ItemNotificacion key={item._id} item={item} esNueva onAbrir={abrirUna} />
                             ))}
                         </ul>
                         <div className="notif-modal-acciones">
-                            <button type="button" className="btn btn-outline" onClick={() => setAvisoLogin(false)}>
-                                Ver más tarde
+                            <button
+                                type="button"
+                                className="btn btn-navy"
+                                onClick={() => { setAvisoLogin(false); setAvisoExtra(''); }}
+                            >
+                                Entendido
                             </button>
                         </div>
                     </div>

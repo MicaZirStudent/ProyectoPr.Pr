@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Brand from './Brand';
-import { BuildingIcon } from './Icons';
 import NotificationBell from './NotificationBell';
 import './AgentLayout.css';
 
@@ -29,11 +28,11 @@ const LegalLayout = ({ children, title, subtitle, actions }) => {
             <nav className="topbar">
                 <button
                     type="button"
-                    className="topbar-menu"
+                    className={`topbar-menu ${menuAbierto ? 'is-open' : ''}`}
                     onClick={() => setMenuAbierto((v) => !v)}
-                    aria-label="Abrir menú"
+                    aria-expanded={menuAbierto}
                 >
-                    ☰
+                    {menuAbierto ? 'Cerrar' : 'Menú'}
                 </button>
                 <button type="button" className="topbar-brand" onClick={() => irA('/legal/publicaciones')}>
                     <Brand compact />
@@ -62,10 +61,11 @@ const LegalLayout = ({ children, title, subtitle, actions }) => {
                         className={`sidebar-link ${activo('/legal/publicaciones') ? 'is-active' : ''}`}
                         onClick={() => irA('/legal/publicaciones')}
                     >
-                        <span className="sidebar-icon"><BuildingIcon size={18} /></span>
-                        Publicaciones
+                        <span className="sidebar-num">01</span>
+                        <span className="sidebar-text">Publicaciones</span>
                     </button>
                 </nav>
+                <div className="sidebar-pie" aria-hidden="true" />
             </aside>
 
             <div className="app-body">

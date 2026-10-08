@@ -116,8 +116,8 @@ const EditarPublicacion = () => {
             title="Editar publicación"
             subtitle="Modificá los datos de la propiedad"
             actions={
-                <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
-                    ← Volver
+                <button type="button" className="btn btn-outline btn-back" onClick={() => navigate('/mis-publicaciones')}>
+                    Volver
                 </button>
             }
         >

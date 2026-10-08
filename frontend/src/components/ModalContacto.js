@@ -89,13 +89,13 @@ const ModalContacto = ({ publicacion, onClose }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-contacto" onClick={(e) => e.stopPropagation()}>
-                <button type="button" className="modal-cerrar" onClick={onClose} aria-label="Cerrar">×</button>
+            <div className="modal-contacto modal-panel" onClick={(e) => e.stopPropagation()}>
+                <button type="button" className="modal-cerrar" onClick={onClose}>Cerrar</button>
                 <h2 className="modal-titulo">Contactar por: {publicacion.titulo}</h2>
                 <p className="modal-subtitulo">Dejá tus datos y elegí un horario para visitar la propiedad</p>
 
                 {cargando ? (
-                    <p className="catalogo-vacio">Cargando disponibilidad...</p>
+                    <p className="modal-subtitulo">Cargando disponibilidad...</p>
                 ) : exito ? (
                     <p className="alert alert-ok">{exito}</p>
                 ) : (
@@ -116,7 +116,7 @@ const ModalContacto = ({ publicacion, onClose }) => {
                         </div>
 
                         {diasDisponibles.length === 0 ? (
-                            <p className="catalogo-vacio">El agente todavía no cargó horarios disponibles.</p>
+                            <p className="alert alert-error">El agente todavía no cargó horarios disponibles.</p>
                         ) : (
                             <>
                                 <p className="modal-ayuda">Elegí un día</p>

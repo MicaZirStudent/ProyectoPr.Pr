@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import SinFoto from '../components/SinFoto';
 import { withPublicacionMedia } from '../utils/publicacionMedia';
 import './MisPublicaciones.css';
 
@@ -62,19 +63,19 @@ const MisPublicaciones = () => {
 
     const colorEstado = (estado) => {
         const colores = {
-            borrador: '#9CA3AF',
-            Borrador: '#9CA3AF',
-            en_revision: '#F59E0B',
-            'En revision': '#F59E0B',
-            'Enviada a revision': '#F59E0B',
-            observada: '#EF4444',
-            Observada: '#EF4444',
-            publicada: '#1a2b4a',
-            Publicada: '#1a2b4a',
-            dada_de_baja: '#6B7280',
-            'Dada de baja': '#6B7280'
+            borrador: '#5d6b7c',
+            Borrador: '#5d6b7c',
+            en_revision: '#b97a12',
+            'En revision': '#b97a12',
+            'Enviada a revision': '#b97a12',
+            observada: '#b8402d',
+            Observada: '#b8402d',
+            publicada: '#44693f',
+            Publicada: '#44693f',
+            dada_de_baja: '#3d4d61',
+            'Dada de baja': '#3d4d61'
         };
-        return colores[estado] || '#9CA3AF';
+        return colores[estado] || '#5d6b7c';
     };
 
     const idDe = (pub) => pub._id || pub.idPublicacion;
@@ -95,7 +96,7 @@ const MisPublicaciones = () => {
             subtitle="Gestioná tus propiedades"
             actions={
                 <button className="btn btn-primary" onClick={() => navigate('/crear-publicacion')}>
-                    + Nueva publicación
+                    Nueva publicación
                 </button>
             }
         >
@@ -117,7 +118,7 @@ const MisPublicaciones = () => {
                                         {imagenes.length > 0 ? (
                                             <img className="property-img" src={imagenes[indice]} alt={pub.titulo} />
                                         ) : (
-                                            <div className="property-sin-foto">Sin foto</div>
+                                            <SinFoto />
                                         )}
 
                                         <div className="property-badges">
@@ -136,7 +137,7 @@ const MisPublicaciones = () => {
                                                     disabled={indice === 0}
                                                     aria-label="Imagen anterior"
                                                 >
-                                                    ‹
+                                                    <span className="chevron chevron-izq" />
                                                 </button>
                                                 <button
                                                     type="button"
@@ -145,7 +146,7 @@ const MisPublicaciones = () => {
                                                     disabled={indice === imagenes.length - 1}
                                                     aria-label="Imagen siguiente"
                                                 >
-                                                    ›
+                                                    <span className="chevron" />
                                                 </button>
                                                 <span className="property-indicador">{indice + 1}/{imagenes.length}</span>
                                             </>
@@ -154,7 +155,7 @@ const MisPublicaciones = () => {
                                     <div className="property-body">
                                         {estadoDe(pub) === 'Observada' && (
                                             <div className="property-banner-observada">
-                                                <span>⚠ Tiene observaciones</span>
+                                                <span>Tiene observaciones del Área Legal</span>
                                                 <button type="button" onClick={() => setVerComentariosPub(pub)}>
                                                     Ver comentarios
                                                 </button>
@@ -209,7 +210,7 @@ const MisPublicaciones = () => {
 
             {verComentariosPub && (
                 <div className="obs-modal-fondo" onClick={() => setVerComentariosPub(null)}>
-                    <div className="obs-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="obs-modal modal-panel" onClick={(e) => e.stopPropagation()}>
                         <h2 className="obs-modal-titulo">Observaciones del Área Legal</h2>
                         <p className="obs-modal-subtitulo">{verComentariosPub.titulo}</p>
                         <p className="obs-modal-texto">
