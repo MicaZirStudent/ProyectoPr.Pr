@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Brand from '../components/Brand';
 import logoLight from '../assets/brand/solution-logo-light.png';
+import { API_URL } from '../utils/http';
+import { guardarSesion, haySesion, obtenerUsuario, panelDeRol } from '../utils/sesion';
 import './Login.css';
 
 const Login = () => {
@@ -10,25 +12,25 @@ const Login = () => {
     const [contraseña, setContraseña] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    const [params] = useSearchParams();
+    const sesionExpirada = params.get('sesion') === 'expirada';
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const respuesta = await axios.post('http://localhost:3001/api/auth/login', {
+            const respuesta = await axios.post(`${API_URL}/api/auth/login`, {
                 email: correo.trim().toLowerCase(),
                 password: contraseña
             });
-            localStorage.setItem('token', respuesta.data.token);
-            localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario));
+            const { token, usuario } = respuesta.data;
+            guardarSesion(token, usuario);
             sessionStorage.setItem('mostrarAvisosLogin', '1');
             if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
                 Notification.requestPermission();
             }
-            if (respuesta.data.usuario?.rol === 'Area legal') {
-                navigate('/legal/publicaciones');
-            } else {
-                navigate('/dashboard');
-            }
+            // Si venía de una pantalla protegida, vuelve a ella; si no, a su panel
+            navigate(location.state?.desde || panelDeRol(usuario.rol), { replace: true });
         } catch (error) {
             if (!error.response) {
                 setError('No se pudo conectar con el servidor. ¿Está el backend en marcha?');
@@ -39,6 +41,11 @@ const Login = () => {
             }
         }
     };
+
+    // Con la sesión iniciada no tiene sentido volver a loguearse
+    if (haySesion()) {
+        return <Navigate to={panelDeRol(obtenerUsuario().rol)} replace />;
+    }
 
     return (
         <div className="login-wrap">
@@ -56,6 +63,9 @@ const Login = () => {
                     <Brand compact onLight />
                     <h1 className="login-title">Iniciar sesión</h1>
                     <p className="login-subtitle">Ingresá con tu cuenta institucional</p>
+                    {sesionExpirada && !error && (
+                        <p className="alert alert-error">Tu sesión expiró por inactividad. Ingresá nuevamente.</p>
+                    )}
                     {error && <p className="alert alert-error">{error}</p>}
                     <form onSubmit={handleLogin}>
                         <div className="field">

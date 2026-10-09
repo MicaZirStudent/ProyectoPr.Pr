@@ -140,3 +140,23 @@
     padding: 0.85rem 1.4rem;
     font-size: 1rem;
 }
+
+.disp-botones {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Las acciones quedan sobre el fondo azul: contorno en beige */
+.disp-botones .btn-outline {
+    --btn-fg: var(--beige-100);
+    --btn-border: rgba(241, 235, 216, 0.55);
+    --btn-sweep: var(--beige-100);
+    --btn-sweep-fg: var(--navy-900);
+}
+
+/* Confirmación junto a los botones, visible sin volver a subir */
+.disp-exito-pie {
+    margin-top: 1rem;
+    animation: aparecer 0.3s ease both;
+}

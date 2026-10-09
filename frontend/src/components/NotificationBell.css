@@ -157,6 +157,10 @@
 .notif-revision { --tipo: var(--warning); }
 .notif-aprobada { --tipo: var(--sage-600); }
 .notif-observada { --tipo: var(--danger); }
+.notif-devuelta { --tipo: var(--warning); }
+.notif-eliminada { --tipo: var(--danger); }
+.notif-asignada { --tipo: var(--sage-600); }
+.notif-desasignada { --tipo: var(--muted); }
 
 .notif-item-head {
     display: flex;

@@ -8,50 +8,57 @@ const {
     editarPublicacion,
     eliminarPublicacion,
     enviarARevision,
+    obtenerDocumento,
     obtenerPublicacionesPublicas,
     obtenerPublicacionPublicaPorId,
     obtenerPublicacionesPendientesRevision,
     obtenerHistorialLegal,
     aprobarPublicacion,
-    observarPublicacion
+    observarPublicacion,
+    revertirEstado,
+    reasignarAgente,
+    ROL_AGENTE,
+    ROL_LEGAL,
+    ROL_ADMIN
 } = require('../controllers/publicacionController');
 
 const { verificarToken, verificarRol } = require('../middleware/authMiddleware');
 
-// GET /api/publicaciones/mis-publicaciones — trae las publicaciones del agente logueado
-router.get('/mis-publicaciones', verificarToken, obtenerMisPublicaciones);
+const soloAgente = [verificarToken, verificarRol(ROL_AGENTE)];
+const soloLegal = [verificarToken, verificarRol(ROL_LEGAL)];
+const agenteOAdmin = [verificarToken, verificarRol(ROL_AGENTE, ROL_ADMIN)];
 
-// GET /api/publicaciones/publicas — catálogo público de propiedades publicadas (sin login)
-// Va ANTES de '/:id' para que Express no confunda "publicas" con un id
+// ---------- Rutas públicas (catálogo, sin login) ----------
+// Van ANTES de '/:id' para que Express no confunda "publicas" con un id
 router.get('/publicas', obtenerPublicacionesPublicas);
-
-// GET /api/publicaciones/publicas/:id — ficha pública de una propiedad publicada (sin login)
 router.get('/publicas/:id', obtenerPublicacionPublicaPorId);
 
-// ---------- CU-05: Revisar Publicación (Área Legal) ----------
-// Van ANTES de '/:id' para que Express no confunda estas rutas con un id
-router.get('/pendientes-revision', verificarToken, verificarRol('Area legal'), obtenerPublicacionesPendientesRevision);
-router.get('/historial', verificarToken, verificarRol('Area legal'), obtenerHistorialLegal);
+// ---------- Panel del agente / administrador ----------
+// Agente: sus publicaciones. Administrador: todas.
+router.get('/mis-publicaciones', ...agenteOAdmin, obtenerMisPublicaciones);
 
-// GET /api/publicaciones/:id — trae una publicación por su id
-router.get('/:id', verificarToken, obtenerPublicacionPorId);
+// ---------- CU-05: Revisión (Área Legal) ----------
+router.get('/pendientes-revision', ...soloLegal, obtenerPublicacionesPendientesRevision);
+router.get('/historial', ...soloLegal, obtenerHistorialLegal);
 
-// POST /api/publicaciones/crear — crea una publicación nueva
-router.post('/crear', verificarToken, crearPublicacion);
+// Solo el agente carga publicaciones nuevas (el administrador no)
+router.post('/crear', ...soloAgente, crearPublicacion);
 
-// PUT /api/publicaciones/:id — edita una publicación existente
-router.put('/:id', verificarToken, editarPublicacion);
+router.get('/:id', ...agenteOAdmin, obtenerPublicacionPorId);
+router.put('/:id', ...agenteOAdmin, editarPublicacion);
 
-// DELETE /api/publicaciones/:id — elimina una publicación en borrador
-router.delete('/:id', verificarToken, eliminarPublicacion);
+// Agente (propias, en Borrador o Publicada), Área Legal y Administrador (cualquiera)
+router.delete('/:id', verificarToken, verificarRol(ROL_AGENTE, ROL_LEGAL, ROL_ADMIN), eliminarPublicacion);
 
-// PATCH /api/publicaciones/:id/enviar-revision — cambia el estado a "Enviada a revision"
-router.patch('/:id/enviar-revision', verificarToken, enviarARevision);
+// Administrador: cambia el agente responsable y notifica a ambos
+router.patch('/:id/reasignar', verificarToken, verificarRol(ROL_ADMIN), reasignarAgente);
 
-// PATCH /api/publicaciones/:id/observar — Área Legal devuelve la publicación con comentarios
-router.patch('/:id/observar', verificarToken, verificarRol('Area legal'), observarPublicacion);
+// Descarga de un PDF adjunto
+router.get('/:id/documentos/:idDocumento', verificarToken, verificarRol(ROL_AGENTE, ROL_LEGAL, ROL_ADMIN), obtenerDocumento);
 
-// PATCH /api/publicaciones/:id/aprobar — Área Legal aprueba y publica
-router.patch('/:id/aprobar', verificarToken, verificarRol('Area legal'), aprobarPublicacion);
+router.patch('/:id/enviar-revision', ...soloAgente, enviarARevision);
+router.patch('/:id/observar', ...soloLegal, observarPublicacion);
+router.patch('/:id/aprobar', ...soloLegal, aprobarPublicacion);
+router.patch('/:id/revertir-estado', ...soloLegal, revertirEstado);
 
 module.exports = router;

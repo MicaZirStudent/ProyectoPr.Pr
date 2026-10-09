@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const Usuario = require('../../models/usuario');
+const { firmarToken } = require('../middleware/authMiddleware');
 
 const MENSAJE_RECUPERO = 'Si el correo ingresado está registrado, recibirás un enlace de restablecimiento en breve';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -67,11 +67,7 @@ const login = async (req, res) => {
             return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
         }
 
-        const token = jwt.sign(
-            { idUsuario: usuario._id, rol: usuario.rol },
-            process.env.JWT_SECRET,
-            { expiresIn: '30m' }
-        );
+        const token = firmarToken({ idUsuario: usuario._id, rol: usuario.rol });
 
         res.json({
             mensaje: 'Login exitoso',
@@ -160,4 +156,27 @@ const restablecerContrasena = async (req, res) => {
     }
 };
 
-module.exports = { registrar, login, solicitarRecuperacion, restablecerContrasena };
+// Confirma que la sesión sigue vigente y que el usuario continúa activo.
+// verificarToken ya devuelve el token renovado en el header.
+const obtenerSesion = async (req, res) => {
+    try {
+        const usuario = await Usuario.findById(req.usuario.idUsuario).select('nombre apellido rol estado');
+
+        if (!usuario || usuario.estado === 'Inactivo') {
+            return res.status(401).json({ mensaje: 'Tu sesión expiró. Iniciá sesión nuevamente' });
+        }
+
+        res.json({
+            usuario: {
+                idUsuario: usuario._id,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                rol: usuario.rol
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al verificar la sesión', error: error.message });
+    }
+};
+
+module.exports = { registrar, login, solicitarRecuperacion, restablecerContrasena, obtenerSesion };

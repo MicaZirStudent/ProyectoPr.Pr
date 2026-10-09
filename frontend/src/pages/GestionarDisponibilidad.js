@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import AgentLayout from '../components/AgentLayout';
 import './GestionarDisponibilidad.css';
+import { API_URL } from '../utils/http';
+import { encabezadoAuth } from '../utils/sesion';
 
 const DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 const HORAS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -25,14 +27,10 @@ const GestionarDisponibilidad = () => {
     const [cargando, setCargando] = useState(true);
     const [guardando, setGuardando] = useState(false);
 
-    const auth = () => ({
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
     useEffect(() => {
         const cargar = async () => {
             try {
-                const respuesta = await axios.get(`http://localhost:3001/api/disponibilidad/${id}`, auth());
+                const respuesta = await axios.get(`${API_URL}/api/disponibilidad/${id}`, encabezadoAuth());
                 setTitulo(respuesta.data.publicacion.titulo);
                 const actual = {};
                 respuesta.data.bloques.forEach((bloque) => {
@@ -40,10 +38,6 @@ const GestionarDisponibilidad = () => {
                 });
                 setSeleccion(actual);
             } catch (err) {
-                if (err.response?.status === 401) {
-                    navigate('/login');
-                    return;
-                }
                 setError(err.response?.data?.mensaje || 'No se pudo cargar la disponibilidad');
             } finally {
                 setCargando(false);
@@ -84,26 +78,24 @@ const GestionarDisponibilidad = () => {
 
         setGuardando(true);
         try {
-            const respuesta = await axios.put(`http://localhost:3001/api/disponibilidad/${id}`, { bloques }, auth());
+            const respuesta = await axios.put(`${API_URL}/api/disponibilidad/${id}`, { bloques }, encabezadoAuth());
             setExito(respuesta.data.mensaje);
         } catch (err) {
-            if (err.response?.status === 401) {
-                navigate('/login');
-                return;
-            }
             setError(err.response?.data?.mensaje || MENSAJE_VACIO);
         } finally {
             setGuardando(false);
         }
     };
 
+    const volverAMisPublicaciones = () => navigate('/mis-publicaciones');
+
     return (
         <AgentLayout
             title="Gestionar disponibilidad"
             subtitle={titulo || 'Elegí días y horarios de visita'}
             actions={
-                <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
-                    Cancelar
+                <button type="button" className="btn btn-outline btn-back" onClick={volverAMisPublicaciones}>
+                    Volver a mis publicaciones
                 </button>
             }
         >
@@ -112,7 +104,6 @@ const GestionarDisponibilidad = () => {
             ) : (
                 <>
                     {error && <p className="disp-error">{error}</p>}
-                    {exito && <p className="disp-exito">{exito}</p>}
                     <p className="disp-ayuda">Seleccioná al menos un día y un horario. Los clientes van a ver estos turnos.</p>
                     <div className="disp-tabla-wrap">
                         <table className="disp-tabla">
@@ -144,10 +135,16 @@ const GestionarDisponibilidad = () => {
                     </div>
                     <div className="disp-acciones">
                         <span className="disp-contador">{cantidad} horario{cantidad === 1 ? '' : 's'} seleccionado{cantidad === 1 ? '' : 's'}</span>
-                        <button type="button" className="btn btn-primary" onClick={guardar} disabled={guardando}>
-                            {guardando ? 'Guardando...' : 'Guardar'}
-                        </button>
+                        <div className="disp-botones">
+                            <button type="button" className="btn btn-outline btn-back" onClick={volverAMisPublicaciones}>
+                                Volver a mis publicaciones
+                            </button>
+                            <button type="button" className="btn btn-primary" onClick={guardar} disabled={guardando}>
+                                {guardando ? 'Guardando...' : 'Guardar'}
+                            </button>
+                        </div>
                     </div>
+                    {exito && <p className="disp-exito disp-exito-pie" role="status">{exito}</p>}
                 </>
             )}
         </AgentLayout>

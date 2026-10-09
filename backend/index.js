@@ -21,12 +21,14 @@ const turnoRoutes = require('./src/routes/turnoRoutes');
 const disponibilidadRoutes = require('./src/routes/disponibilidadRoutes');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const notificacionRoutes = require('./src/routes/notificacionRoutes');
+const { HEADER_TOKEN_RENOVADO } = require('./src/middleware/authMiddleware');
 
 // Creamos la aplicación de Express
 const app = express();
 
-// Habilitamos CORS para todas las rutas
-app.use(cors());
+// Habilitamos CORS para todas las rutas.
+// Exponemos el header del token renovado para que el frontend pueda leerlo.
+app.use(cors({ exposedHeaders: [HEADER_TOKEN_RENOVADO] }));
 
 // Habilitamos que Express entienda JSON en el cuerpo de las peticiones
 // Límite alto porque las fotos de las publicaciones viajan como data URLs dentro del JSON

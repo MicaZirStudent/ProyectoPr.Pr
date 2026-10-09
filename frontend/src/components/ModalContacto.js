@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../utils/http';
 
 const emailValido = (correo) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(correo).trim());
 const telefonoValido = (telefono) => {
@@ -27,7 +28,7 @@ const ModalContacto = ({ publicacion, onClose }) => {
     useEffect(() => {
         const cargar = async () => {
             try {
-                const respuesta = await axios.get(`http://localhost:3001/api/turnos/horarios/${publicacion._id}`);
+                const respuesta = await axios.get(`${API_URL}/api/turnos/horarios/${publicacion._id}`);
                 setHorarios(respuesta.data.horarios || []);
             } catch (err) {
                 setError(err.response?.data?.mensaje || 'No se pudo cargar la disponibilidad');
@@ -72,7 +73,7 @@ const ModalContacto = ({ publicacion, onClose }) => {
 
         setEnviando(true);
         try {
-            const respuesta = await axios.post('http://localhost:3001/api/turnos/solicitar', {
+            const respuesta = await axios.post(`${API_URL}/api/turnos/solicitar`, {
                 nombre: nombre.trim(),
                 correoElectronico: correo.trim(),
                 telefono: whatsapp.trim(),

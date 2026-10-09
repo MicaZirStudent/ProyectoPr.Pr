@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AgentLayout from '../components/AgentLayout';
 import './GestionUsuarios.css';
+import { API_URL } from '../utils/http';
+import { encabezadoAuth } from '../utils/sesion';
 
 const ROLES = ['Agente', 'Area legal', 'Administrador'];
 const VACIO = {
@@ -15,8 +16,6 @@ const VACIO = {
 };
 
 const GestionUsuarios = () => {
-    const navigate = useNavigate();
-    const sesion = JSON.parse(localStorage.getItem('usuario') || 'null');
     const [usuarios, setUsuarios] = useState([]);
     const [form, setForm] = useState(VACIO);
     const [editandoId, setEditandoId] = useState(null);
@@ -26,31 +25,21 @@ const GestionUsuarios = () => {
     const [guardando, setGuardando] = useState(false);
     const [aEliminar, setAEliminar] = useState(null);
 
-    const auth = () => ({
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
     const cargar = async () => {
         try {
-            const respuesta = await axios.get('http://localhost:3001/api/usuarios', auth());
+            const respuesta = await axios.get(`${API_URL}/api/usuarios`, encabezadoAuth());
             setUsuarios(respuesta.data);
         } catch (err) {
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/login');
-                return;
-            }
             setError(err.response?.data?.mensaje || 'No se pudieron cargar los usuarios');
         } finally {
             setCargando(false);
         }
     };
 
+    // El acceso por rol lo controla RutaProtegida
     useEffect(() => {
-        if (sesion?.rol !== 'Administrador') {
-            navigate('/dashboard');
-            return;
-        }
         cargar();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onChange = (e) => {
@@ -94,26 +83,22 @@ const GestionUsuarios = () => {
                 if (form.password.trim()) {
                     payload.password = form.password;
                 }
-                const respuesta = await axios.put(`http://localhost:3001/api/usuarios/${editandoId}`, payload, auth());
+                const respuesta = await axios.put(`${API_URL}/api/usuarios/${editandoId}`, payload, encabezadoAuth());
                 setExito(respuesta.data.mensaje);
             } else {
-                const respuesta = await axios.post('http://localhost:3001/api/usuarios', {
+                const respuesta = await axios.post(`${API_URL}/api/usuarios`, {
                     nombre: form.nombre,
                     apellido: form.apellido,
                     email: form.email,
                     password: form.password,
                     rol: form.rol
-                }, auth());
+                }, encabezadoAuth());
                 setExito(respuesta.data.mensaje);
             }
             setForm(VACIO);
             setEditandoId(null);
             await cargar();
         } catch (err) {
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/login');
-                return;
-            }
             setError(err.response?.data?.mensaje || 'Complete todos los campos obligatorios');
         } finally {
             setGuardando(false);
@@ -142,7 +127,7 @@ const GestionUsuarios = () => {
         setError('');
         setExito('');
         try {
-            const respuesta = await axios.delete(`http://localhost:3001/api/usuarios/${aEliminar._id}`, auth());
+            const respuesta = await axios.delete(`${API_URL}/api/usuarios/${aEliminar._id}`, encabezadoAuth());
             setExito(respuesta.data.mensaje);
             setAEliminar(null);
             if (editandoId === aEliminar._id) {

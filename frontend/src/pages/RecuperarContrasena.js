@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Brand from '../components/Brand';
 import './Login.css';
+import { API_URL } from '../utils/http';
 
 const RecuperarContrasena = () => {
     const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const RecuperarContrasena = () => {
         setEnviando(true);
         setMensaje('');
         try {
-            const respuesta = await axios.post('http://localhost:3001/api/auth/recuperar', {
+            const respuesta = await axios.post(`${API_URL}/api/auth/recuperar`, {
                 email: email.trim()
             });
             setMensaje(respuesta.data.mensaje);

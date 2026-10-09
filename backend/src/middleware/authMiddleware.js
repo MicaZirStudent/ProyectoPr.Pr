@@ -1,19 +1,26 @@
-// Importamos jsonwebtoken para verificar el token
 const jwt = require('jsonwebtoken');
 
-// Esta función se ejecuta ANTES de llegar al controller
-// Verifica que el usuario esté logueado y que su token sea válido
-const verificarToken = (req, res, next) => {
+// Duración de la sesión por inactividad: cada petición autenticada la renueva
+const DURACION_SESION = '30m';
+const HEADER_TOKEN_RENOVADO = 'X-Token-Renovado';
+// Las consultas automáticas (ej. polling de avisos) lo envían para no extender la sesión
+const HEADER_SIN_RENOVAR = 'x-sin-renovar';
 
-    // El token viaja en el header "Authorization" con el formato "Bearer TOKEN"
+const firmarToken = ({ idUsuario, rol }) => jwt.sign(
+    { idUsuario, rol },
+    process.env.JWT_SECRET,
+    { expiresIn: DURACION_SESION }
+);
+
+// Verifica que el usuario esté logueado y que su token sea válido.
+// Si lo es, devuelve un token renovado en el header X-Token-Renovado (sesión deslizante).
+const verificarToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
 
-    // Si no viene el header, rechazamos la petición
     if (!authHeader) {
         return res.status(401).json({ mensaje: 'Acceso denegado. Token no proporcionado' });
     }
 
-    // Separamos la palabra "Bearer" del token real
     const token = authHeader.split(' ')[1];
 
     if (!token) {
@@ -21,23 +28,20 @@ const verificarToken = (req, res, next) => {
     }
 
     try {
-        // Verificamos que el token sea válido y no haya expirado
-        // Si es válido, jwt.verify nos devuelve los datos que guardamos al hacer login
         const datos = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Guardamos los datos del usuario en req.usuario para que el controller los pueda usar
         req.usuario = datos;
 
-        // Llamamos a next() para que la petición siga su camino al controller
-        next();
+        if (!req.headers[HEADER_SIN_RENOVAR]) {
+            res.set(HEADER_TOKEN_RENOVADO, firmarToken(datos));
+        }
 
+        next();
     } catch (error) {
-        // Si el token expiró o es inválido
-        return res.status(401).json({ mensaje: 'Token inválido o expirado. Iniciá sesión nuevamente' });
+        return res.status(401).json({ mensaje: 'Tu sesión expiró. Iniciá sesión nuevamente' });
     }
 };
-// Middleware para restringir el acceso según el rol del usuario
-// Se usa DESPUÉS de verificarToken, porque necesita que exista req.usuario
+
+// Restringe el acceso según el rol. Se usa DESPUÉS de verificarToken.
 const verificarRol = (...rolesPermitidos) => {
     return (req, res, next) => {
         if (!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
@@ -47,5 +51,4 @@ const verificarRol = (...rolesPermitidos) => {
     };
 };
 
-// Exportamos el middleware
-module.exports = { verificarToken, verificarRol };
+module.exports = { verificarToken, verificarRol, firmarToken, HEADER_TOKEN_RENOVADO };

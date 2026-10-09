@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Brand from '../components/Brand';
 import './Login.css';
+import { API_URL } from '../utils/http';
 
 const RestablecerContrasena = () => {
     const { token } = useParams();
@@ -25,7 +26,7 @@ const RestablecerContrasena = () => {
 
         setGuardando(true);
         try {
-            const respuesta = await axios.post('http://localhost:3001/api/auth/restablecer', {
+            const respuesta = await axios.post(`${API_URL}/api/auth/restablecer`, {
                 token,
                 password,
                 confirmarPassword: confirmar

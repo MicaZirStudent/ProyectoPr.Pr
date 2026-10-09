@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
+import { ROLES, obtenerUsuario } from '../utils/sesion';
 import './Dashboard.css';
 
-const Dashboard = () => {
-    const navigate = useNavigate();
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
-
-    const opciones = [
+const OPCIONES_POR_ROL = {
+    [ROLES.AGENTE]: [
         {
             path: '/mis-publicaciones',
             titulo: 'Mis publicaciones',
@@ -15,29 +13,40 @@ const Dashboard = () => {
         {
             path: '/crear-publicacion',
             titulo: 'Agregar nueva propiedad',
-            texto: 'Cargá una nueva propiedad al sistema'
+            texto: 'Cargá una nueva propiedad con sus fotos y documentación'
         },
         {
             path: '/mis-turnos',
             titulo: 'Mis turnos',
             texto: 'Revisá y editá las visitas agendadas'
         }
-    ];
-
-    if (usuario?.rol === 'Administrador') {
-        opciones.push({
+    ],
+    [ROLES.ADMIN]: [
+        {
+            path: '/mis-publicaciones',
+            titulo: 'Publicaciones',
+            texto: 'Consultá y editá todas las publicaciones, en cualquier estado'
+        },
+        {
             path: '/gestion-usuarios',
             titulo: 'Gestión de usuarios',
             texto: 'Altas, modificaciones y bajas de cuentas internas'
-        });
-    }
+        }
+    ]
+};
+
+const Dashboard = () => {
+    const navigate = useNavigate();
+    const usuario = obtenerUsuario();
+    const esAdmin = usuario?.rol === ROLES.ADMIN;
+    const opciones = OPCIONES_POR_ROL[usuario?.rol] || OPCIONES_POR_ROL[ROLES.AGENTE];
 
     return (
         <AgentLayout>
             <section className="dash-hero">
-                <p className="dash-hero-kicker">Panel del {usuario?.rol === 'Administrador' ? 'administrador' : 'agente'}</p>
+                <p className="dash-hero-kicker">{esAdmin ? 'Panel de administración' : 'Panel del agente'}</p>
                 <h1>Bienvenido, {usuario?.nombre}</h1>
-                <p>Seleccioná una opción para comenzar a gestionar tu cartera.</p>
+                <p>Seleccioná una opción para comenzar a gestionar {esAdmin ? 'el sistema' : 'tu cartera'}.</p>
             </section>
 
             <div className="dashboard-cards">

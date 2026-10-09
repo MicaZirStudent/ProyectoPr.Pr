@@ -129,13 +129,6 @@
     font-size: 0.84rem;
 }
 
-.btn-eliminar {
-    --btn-fg: var(--danger);
-    --btn-border: var(--danger);
-    --btn-sweep: var(--danger);
-    --btn-sweep-fg: #fff;
-}
-
 .usr-modal-fondo {
     position: fixed;
     inset: 0;

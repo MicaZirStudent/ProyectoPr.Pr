@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AgentLayout from '../components/AgentLayout';
 import './MisTurnos.css';
+import { API_URL } from '../utils/http';
+import { encabezadoAuth } from '../utils/sesion';
 
 const VACIO = {
     nombre: '',
@@ -14,7 +15,6 @@ const VACIO = {
 };
 
 const MisTurnos = () => {
-    const navigate = useNavigate();
     const [turnos, setTurnos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState('');
@@ -24,32 +24,21 @@ const MisTurnos = () => {
     const [horarios, setHorarios] = useState([]);
     const [guardando, setGuardando] = useState(false);
 
-    const auth = () => ({
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
     const cargar = async () => {
         try {
-            const respuesta = await axios.get('http://localhost:3001/api/turnos/mios', auth());
+            const respuesta = await axios.get(`${API_URL}/api/turnos/mios`, encabezadoAuth());
             setTurnos(respuesta.data);
         } catch (err) {
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/login');
-                return;
-            }
             setError(err.response?.data?.mensaje || 'No se pudieron cargar los turnos');
         } finally {
             setCargando(false);
         }
     };
 
+    // El acceso por rol lo controla RutaProtegida
     useEffect(() => {
-        const sesion = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (!sesion) {
-            navigate('/login');
-            return;
-        }
         cargar();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onChange = (e) => {
@@ -72,7 +61,7 @@ const MisTurnos = () => {
             estado: turno.estado
         });
         try {
-            const respuesta = await axios.get(`http://localhost:3001/api/turnos/horarios/${turno.id_publicacion}`);
+            const respuesta = await axios.get(`${API_URL}/api/turnos/horarios/${turno.id_publicacion}`);
             const lista = respuesta.data.horarios || [];
             const yaEsta = lista.some((h) => h.fecha === turno.fecha && h.hora === turno.hora);
             setHorarios(yaEsta ? lista : [{ fecha: turno.fecha, hora: turno.hora }, ...lista]);
@@ -96,13 +85,13 @@ const MisTurnos = () => {
         setError('');
         setExito('');
         try {
-            const respuesta = await axios.put(`http://localhost:3001/api/turnos/${editando._id}`, {
+            const respuesta = await axios.put(`${API_URL}/api/turnos/${editando._id}`, {
                 nombre: form.nombre,
                 correoElectronico: form.correoElectronico,
                 telefono: form.telefono,
                 estado: form.estado,
                 fechaHora: `${form.fecha} ${form.hora}`
-            }, auth());
+            }, encabezadoAuth());
             setExito(respuesta.data.mensaje);
             setEditando(null);
             setForm(VACIO);

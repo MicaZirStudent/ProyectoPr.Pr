@@ -2,12 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './NotificationBell.css';
+import { API_URL } from '../utils/http';
+import { encabezadoAuth, haySesion } from '../utils/sesion';
 
 // Las notificaciones viejas no tienen "tipo": lo deducimos del mensaje
 const tipoDe = (item) => {
     if (item.tipo) return item.tipo;
     const texto = String(item.mensaje || '').toLowerCase();
     if (texto.includes('turno')) return 'turno';
+    if (texto.includes('se te asignó')) return 'asignada';
+    if (texto.includes('se te dio de baja')) return 'desasignada';
+    if (texto.includes('eliminó') || texto.includes('dio de baja')) return 'eliminada';
+    if (texto.includes('devolvió') || texto.includes('volvió a quedar')) return 'devuelta';
     if (texto.includes('aprobada')) return 'aprobada';
     if (texto.includes('observaciones')) return 'observada';
     if (texto.includes('revision') || texto.includes('revisión')) return 'revision';
@@ -19,6 +25,10 @@ const ETIQUETAS = {
     revision: 'Revisión',
     aprobada: 'Aprobada',
     observada: 'Observada',
+    devuelta: 'Devuelta',
+    eliminada: 'Eliminada',
+    asignada: 'Asignada',
+    desasignada: 'Reasignada',
     aviso: 'Aviso'
 };
 
@@ -107,15 +117,13 @@ const NotificationBell = () => {
     const [itemsLogin, setItemsLogin] = useState([]);
     const caja = useRef(null);
 
-    const auth = () => ({
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
+    // Consulta periódica: no extiende la sesión (eso lo hace la navegación del usuario)
     const cargar = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return [];
+        if (!haySesion()) return [];
         try {
-            const respuesta = await axios.get('http://localhost:3001/api/notificaciones', auth());
+            const respuesta = await axios.get(`${API_URL}/api/notificaciones`, {
+                headers: { ...encabezadoAuth().headers, 'X-Sin-Renovar': '1' }
+            });
             const lista = respuesta.data || [];
             setItems(lista);
             return lista;
@@ -130,7 +138,7 @@ const NotificationBell = () => {
         if (ids.length === 0) return;
         setItems((prev) => prev.map((n) => (ids.includes(n._id) ? { ...n, leida: true } : n)));
         try {
-            await axios.patch('http://localhost:3001/api/notificaciones/leer-todas', {}, auth());
+            await axios.patch(`${API_URL}/api/notificaciones/leer-todas`, {}, encabezadoAuth());
         } catch {
             /* si falla, el próximo refresco vuelve a traer el estado real */
         }
@@ -201,7 +209,7 @@ const NotificationBell = () => {
         if (!item.leida) {
             setItems((prev) => prev.map((n) => (n._id === item._id ? { ...n, leida: true } : n)));
             try {
-                await axios.patch(`http://localhost:3001/api/notificaciones/${item._id}/leer`, {}, auth());
+                await axios.patch(`${API_URL}/api/notificaciones/${item._id}/leer`, {}, encabezadoAuth());
             } catch {
                 /* igual navegamos */
             }

@@ -15,6 +15,14 @@
     border-bottom: 3px solid var(--sage-500);
 }
 
+.ficha-header-acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
 .ficha-brand {
     background: none;
     border: none;

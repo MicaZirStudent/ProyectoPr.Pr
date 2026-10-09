@@ -1,7 +1,9 @@
-// Importamos el sistema de rutas de react-router-dom
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Importamos todas las pantallas
+import RutaProtegida from './components/RutaProtegida';
+import SesionActiva from './components/SesionActiva';
+import { ROLES } from './utils/sesion';
+
 import Login from './pages/Login';
 import Catalogo from './pages/Catalogo';
 import Dashboard from './pages/Dashboard';
@@ -17,42 +19,42 @@ import PublicacionesPendientes from './pages/legal/PublicacionesPendientes';
 import RecuperarContrasena from './pages/RecuperarContrasena';
 import RestablecerContrasena from './pages/RestablecerContrasena';
 
+const { AGENTE, LEGAL, ADMIN } = ROLES;
+
+// Envuelve una pantalla interna con el control de sesión y de roles
+const protegida = (elemento, roles) => <RutaProtegida roles={roles}>{elemento}</RutaProtegida>;
+
 const App = () => {
     return (
         <BrowserRouter>
+            <SesionActiva />
             <Routes>
-                {/* Catálogo público de propiedades — página de inicio (sin login) */}
+                {/* Públicas: catálogo, ficha y solicitud de turno (el cliente no inicia sesión) */}
                 <Route path="/" element={<Catalogo />} />
                 <Route path="/catalogo" element={<Catalogo />} />
+                <Route path="/propiedad/:id" element={<FichaPublicacion />} />
+                <Route path="/propiedad/:id/solicitar-turno" element={<SolicitarTurno />} />
 
-                {/* Pantalla de login */}
+                {/* Acceso */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/recuperar" element={<RecuperarContrasena />} />
                 <Route path="/restablecer/:token" element={<RestablecerContrasena />} />
 
-                {/* Dashboard principal */}
-                <Route path="/dashboard" element={<Dashboard />} />
+                {/* Agente y Administrador */}
+                <Route path="/dashboard" element={protegida(<Dashboard />, [AGENTE, ADMIN])} />
+                <Route path="/mis-publicaciones" element={protegida(<MisPublicaciones />, [AGENTE, ADMIN])} />
+                <Route path="/editar-publicacion/:id" element={protegida(<EditarPublicacion />, [AGENTE, ADMIN])} />
 
-                {/* Mis publicaciones */}
-                <Route path="/mis-publicaciones" element={<MisPublicaciones />} />
+                {/* Solo Agente: cargar propiedades y gestionar turnos */}
+                <Route path="/crear-publicacion" element={protegida(<CrearPublicacion />, [AGENTE])} />
+                <Route path="/gestionar-disponibilidad/:id" element={protegida(<GestionarDisponibilidad />, [AGENTE])} />
+                <Route path="/mis-turnos" element={protegida(<MisTurnos />, [AGENTE])} />
 
-                {/* Crear publicación */}
-                <Route path="/crear-publicacion" element={<CrearPublicacion />} />
+                {/* Solo Administrador */}
+                <Route path="/gestion-usuarios" element={protegida(<GestionUsuarios />, [ADMIN])} />
 
-                {/* Editar publicación — el :id es dinámico, cambia según la publicación */}
-                <Route path="/editar-publicacion/:id" element={<EditarPublicacion />} />
-
-                {/* Ficha pública de una propiedad publicada (el cliente no inicia sesión) */}
-                <Route path="/propiedad/:id" element={<FichaPublicacion />} />
-
-                {/* Formulario CU-09: solicitar turno de visita */}
-                <Route path="/propiedad/:id/solicitar-turno" element={<SolicitarTurno />} />
-                <Route path="/gestionar-disponibilidad/:id" element={<GestionarDisponibilidad />} />
-                <Route path="/mis-turnos" element={<MisTurnos />} />
-                <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
-
-                {/* Panel Área Legal: revisión, aprobación y observación de publicaciones */}
-                <Route path="/legal/publicaciones" element={<PublicacionesPendientes />} />
+                {/* Área Legal: revisión, aprobación, observación, reversión y baja de publicaciones */}
+                <Route path="/legal/publicaciones" element={protegida(<PublicacionesPendientes />, [LEGAL])} />
             </Routes>
         </BrowserRouter>
     );

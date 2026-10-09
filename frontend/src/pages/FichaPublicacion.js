@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Brand from '../components/Brand';
 import SinFoto from '../components/SinFoto';
 import ImageLightbox from '../components/ImageLightbox';
+import AccesoPanel from '../components/AccesoPanel';
+import { ROLES, haySesion, obtenerUsuario } from '../utils/sesion';
 import './FichaPublicacion.css';
+import { API_URL } from '../utils/http';
 
 const MINIATURAS_VISIBLES = 4;
 
 const FichaPublicacion = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [publicacion, setPublicacion] = useState(null);
     const [cantidadHorarios, setCantidadHorarios] = useState(0);
@@ -22,8 +26,8 @@ const FichaPublicacion = () => {
         const cargar = async () => {
             try {
                 const [pubResp, horResp] = await Promise.all([
-                    axios.get(`http://localhost:3001/api/publicaciones/publicas/${id}`),
-                    axios.get(`http://localhost:3001/api/turnos/horarios/${id}`)
+                    axios.get(`${API_URL}/api/publicaciones/publicas/${id}`),
+                    axios.get(`${API_URL}/api/turnos/horarios/${id}`)
                 ]);
                 setPublicacion(pubResp.data.propiedad);
                 setCantidadHorarios(horResp.data.horarios.length);
@@ -65,6 +69,10 @@ const FichaPublicacion = () => {
     const mapaEmbed = direccion
         ? `https://maps.google.com/maps?q=${encodeURIComponent(direccion)}&z=16&output=embed`
         : '';
+    // Vista interna: el agente dueño gestiona los turnos y el administrador edita la publicación
+    const usuario = haySesion() ? obtenerUsuario() : null;
+    const esDuenio = usuario?.rol === ROLES.AGENTE && String(usuario.idUsuario) === String(publicacion.idAgente);
+    const esAdmin = usuario?.rol === ROLES.ADMIN;
     const mapaEnlace = direccion
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`
         : '';
@@ -75,9 +83,12 @@ const FichaPublicacion = () => {
                 <button type="button" className="ficha-brand" onClick={() => navigate('/')}>
                     <Brand compact />
                 </button>
-                <button type="button" className="btn btn-ghost btn-back" onClick={() => navigate('/')}>
-                    Volver al catálogo
-                </button>
+                <div className="ficha-header-acciones">
+                    {usuario && <AccesoPanel destino={location.state?.desde} />}
+                    <button type="button" className="btn btn-ghost btn-back" onClick={() => navigate('/')}>
+                        Volver al catálogo
+                    </button>
+                </div>
             </header>
 
             <div className="ficha-contenido">
@@ -178,20 +189,54 @@ const FichaPublicacion = () => {
                     {publicacion.agente && <p className="ficha-agente">Agente: {publicacion.agente}</p>}
 
                     <div className="ficha-card-turno">
-                        <h2 className="ficha-seccion-titulo">Visitar la propiedad</h2>
-                        <p className="ficha-turno-info">
-                            {cantidadHorarios > 0
-                                ? `${cantidadHorarios} turnos disponibles en los próximos días`
-                                : 'El agente todavía no cargó horarios disponibles'}
-                        </p>
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            disabled={cantidadHorarios === 0}
-                            onClick={() => navigate(`/propiedad/${id}/solicitar-turno`)}
-                        >
-                            Solicitar turno
-                        </button>
+                        {esDuenio ? (
+                            <>
+                                <h2 className="ficha-seccion-titulo">Turnos de visita</h2>
+                                <p className="ficha-turno-info">
+                                    {cantidadHorarios > 0
+                                        ? `${cantidadHorarios} turnos disponibles en los próximos días`
+                                        : 'Todavía no cargaste días y horarios de visita'}
+                                </p>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => navigate(`/gestionar-disponibilidad/${id}`)}
+                                >
+                                    Editar turnos
+                                </button>
+                            </>
+                        ) : esAdmin ? (
+                            <>
+                                <h2 className="ficha-seccion-titulo">Administración</h2>
+                                <p className="ficha-turno-info">
+                                    Podés modificar los datos de esta publicación desde el panel.
+                                </p>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => navigate(`/editar-publicacion/${id}`)}
+                                >
+                                    Editar publicación
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="ficha-seccion-titulo">Visitar la propiedad</h2>
+                                <p className="ficha-turno-info">
+                                    {cantidadHorarios > 0
+                                        ? `${cantidadHorarios} turnos disponibles en los próximos días`
+                                        : 'El agente todavía no cargó horarios disponibles'}
+                                </p>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    disabled={cantidadHorarios === 0}
+                                    onClick={() => navigate(`/propiedad/${id}/solicitar-turno`)}
+                                >
+                                    Solicitar turno
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

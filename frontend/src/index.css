@@ -310,6 +310,14 @@ a {
     --btn-sweep-fg: #fff;
 }
 
+/* Contorno rojo para acciones destructivas secundarias */
+.btn-eliminar {
+    --btn-fg: var(--danger);
+    --btn-border: var(--danger);
+    --btn-sweep: var(--danger);
+    --btn-sweep-fg: #fff;
+}
+
 /* Sobre fondo azul, el contorno pasa a beige */
 .on-dark .btn-outline,
 .page-header .btn-outline {
@@ -678,4 +686,135 @@ a {
         animation: none !important;
         transition: none !important;
     }
+}
+
+/* ---------- Diálogo de confirmación ---------- */
+
+.confirm-fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 12, 24, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 120;
+    animation: fondo-entrar 0.2s ease both;
+}
+
+.confirm-modal {
+    width: min(480px, 100%);
+    padding: 1.9rem;
+}
+
+.confirm-danger {
+    border-top-color: var(--danger);
+}
+
+.confirm-warning {
+    border-top-color: var(--warning);
+}
+
+.confirm-modal h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    color: var(--navy-800);
+}
+
+.confirm-mensaje {
+    margin: 0 0 0.75rem;
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.confirm-detalle {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 8px;
+    background: #fff;
+    border-left: 4px solid var(--navy-600);
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+}
+
+.confirm-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+}
+
+/* ---------- Lista de documentos PDF ---------- */
+
+.doc-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.doc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 100%;
+    border: 2px solid var(--beige-200);
+    background: #fff;
+    color: var(--navy-800);
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.doc-chip::before {
+    content: 'PDF';
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    background: var(--danger);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.doc-chip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.doc-chip:hover:not(:disabled) {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--beige-100);
+    transform: translateY(-2px);
+}
+
+.doc-chip:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.alert-aviso {
+    background: #e3ebf3;
+    color: var(--navy-700);
+}
+
+.doc-vacio {
+    margin: 0.25rem 0 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.file-aviso {
+    margin: 0.75rem 0 0;
 }

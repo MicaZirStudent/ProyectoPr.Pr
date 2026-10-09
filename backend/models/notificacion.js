@@ -16,7 +16,7 @@ const notificacionSchema = new mongoose.Schema({
   },
   tipo: {
     type: String,
-    enum: ['turno', 'revision', 'aprobada', 'observada']
+    enum: ['turno', 'revision', 'aprobada', 'observada', 'devuelta', 'eliminada', 'asignada', 'desasignada']
   }
 });
 

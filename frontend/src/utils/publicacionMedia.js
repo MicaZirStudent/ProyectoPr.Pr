@@ -1,4 +1,10 @@
-const storageKey = (id) => `solution_pub_media_${id}`;
+// Utilidades para preparar fotos y documentos PDF antes de enviarlos al backend.
+
+export const MAX_PDF_MB = 5;
+const MAX_PDF_BYTES = MAX_PDF_MB * 1024 * 1024;
+
+const MAX_LADO_PX = 1600;
+const CALIDAD_JPEG = 0.8;
 
 export const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -8,12 +14,7 @@ export const fileToDataUrl = (file) =>
         reader.readAsDataURL(file);
     });
 
-const MAX_LADO_PX = 1600;
-const CALIDAD_JPEG = 0.8;
-
-// Las fotos reales (cámara de celular) pueden pesar varios MB cada una y romper
-// el límite del body del servidor. Las redimensionamos y comprimimos en el navegador
-// antes de mandarlas como data URL.
+// Las fotos de celular pueden pesar varios MB: se redimensionan y comprimen en el navegador
 const comprimirImagen = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -31,8 +32,7 @@ const comprimirImagen = (file) =>
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', CALIDAD_JPEG));
             };
             img.src = reader.result;
@@ -40,6 +40,7 @@ const comprimirImagen = (file) =>
         reader.readAsDataURL(file);
     });
 
+// Convierte la lista de fotos del formulario en data URLs listas para guardar
 export const fotosADataUrls = async (fotos = []) => {
     const convertidas = await Promise.all(
         fotos.map(async (item) => {
@@ -59,60 +60,28 @@ export const fotosADataUrls = async (fotos = []) => {
     return convertidas.filter(Boolean);
 };
 
-export const persistPublicacionMedia = async (id, documentos = [], fotos = []) => {
-    const fotosData = await Promise.all(
-        fotos.map(async (item) => {
-            if (typeof item.preview === 'string' && item.preview.startsWith('data:')) {
-                return { name: item.name, preview: item.preview };
-            }
-            if (item.file) {
-                return { name: item.name || item.file.name, preview: await fileToDataUrl(item.file) };
-            }
-            return null;
-        })
-    );
+// Documentos ya guardados viajan solo con su _id; los nuevos con nombre y contenido PDF
+export const documentosAPayload = async (documentos = []) => Promise.all(
+    documentos.map(async (doc) => (doc._id
+        ? { _id: doc._id }
+        : { nombre: doc.name, contenido: await fileToDataUrl(doc.file) }))
+);
 
-    const payload = {
-        documentos: documentos.map((item) => ({ name: item.name })),
-        fotos: fotosData.filter(Boolean)
-    };
+export const pdfDemasiadoGrande = (file) => file.size > MAX_PDF_BYTES;
 
-    try {
-        localStorage.setItem(storageKey(id), JSON.stringify(payload));
-    } catch {
-        try {
-            localStorage.setItem(
-                storageKey(id),
-                JSON.stringify({ documentos: payload.documentos, fotos: payload.fotos.slice(0, 4) })
-            );
-        } catch {
-            /* quota exceeded */
-        }
+// Fotos guardadas en la publicación → formato que usa el formulario
+export const fotosDesdeImagenes = (imagenes = []) => imagenes.map((preview, i) => ({ name: `foto-${i + 1}`, preview }));
+
+// Documentos devueltos por el backend → formato que usa el formulario
+export const documentosDesdeBackend = (documentos = []) => documentos.map((doc) => ({ _id: doc._id, name: doc.nombre }));
+
+export const dataUrlABlob = (dataUrl) => {
+    const [cabecera, base64] = dataUrl.split(',');
+    const tipo = cabecera.match(/data:([^;]+)/)?.[1] || 'application/octet-stream';
+    const binario = atob(base64);
+    const bytes = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) {
+        bytes[i] = binario.charCodeAt(i);
     }
-};
-
-export const getPublicacionMedia = (id) => {
-    try {
-        const raw = localStorage.getItem(storageKey(id));
-        if (!raw) return { documentos: [], fotos: [] };
-        const parsed = JSON.parse(raw);
-        return {
-            documentos: parsed.documentos || [],
-            fotos: parsed.fotos || []
-        };
-    } catch {
-        return { documentos: [], fotos: [] };
-    }
-};
-
-export const withPublicacionMedia = (pub) => {
-    const media = getPublicacionMedia(pub._id || pub.idPublicacion);
-    const fotos = Array.isArray(pub.imagenes) && pub.imagenes.length
-        ? pub.imagenes.map((preview, i) => ({ name: `foto-${i + 1}`, preview }))
-        : media.fotos;
-    return {
-        ...pub,
-        fotos,
-        documentos: media.documentos
-    };
+    return new Blob([bytes], { type: tipo });
 };

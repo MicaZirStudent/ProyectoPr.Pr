@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './SolicitarTurno.css';
+import { API_URL } from '../utils/http';
 
 const MENSAJE_CAMPOS_VACIOS = 'Complete todos los campos para continuar';
 const MENSAJE_EMAIL_TELEFONO = 'Email o teléfono inválidos';
@@ -34,7 +35,7 @@ const SolicitarTurno = () => {
     const [cargando, setCargando] = useState(true);
 
     const cargarHorarios = async () => {
-        const respuesta = await axios.get(`http://localhost:3001/api/turnos/horarios/${id}`);
+        const respuesta = await axios.get(`${API_URL}/api/turnos/horarios/${id}`);
         setPublicacion(respuesta.data.publicacion);
         setHorarios(respuesta.data.horarios);
         return respuesta.data.horarios;
@@ -51,6 +52,7 @@ const SolicitarTurno = () => {
             }
         };
         cargar();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     // Armamos la lista de días distintos para el calendario
@@ -99,7 +101,7 @@ const SolicitarTurno = () => {
 
         setEnviando(true);
         try {
-            const respuesta = await axios.post('http://localhost:3001/api/turnos/solicitar', {
+            const respuesta = await axios.post(`${API_URL}/api/turnos/solicitar`, {
                 nombre: nombre.trim(),
                 correoElectronico: correo.trim(),
                 telefono: whatsapp.trim(),

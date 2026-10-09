@@ -4,7 +4,9 @@ import axios from 'axios';
 import Brand from '../components/Brand';
 import SinFoto from '../components/SinFoto';
 import ModalContacto from '../components/ModalContacto';
+import AccesoPanel from '../components/AccesoPanel';
 import './Catalogo.css';
+import { API_URL } from '../utils/http';
 
 const AMBIENTES_OPCIONES = ['1', '2', '3', '4', '4+'];
 
@@ -51,7 +53,7 @@ const Catalogo = () => {
             if (filtrosActuales.precioHasta) params.precio_hasta = filtrosActuales.precioHasta;
             if (filtrosActuales.moneda) params.moneda = filtrosActuales.moneda;
 
-            const respuesta = await axios.get('http://localhost:3001/api/publicaciones/publicas', { params });
+            const respuesta = await axios.get(`${API_URL}/api/publicaciones/publicas`, { params });
             setPropiedades(respuesta.data.propiedades || []);
         } catch (err) {
             setError(err.response?.data?.mensaje || 'No se pudieron cargar las propiedades');
@@ -89,9 +91,7 @@ const Catalogo = () => {
                 <button type="button" className="catalogo-brand" onClick={() => navigate('/')}>
                     <Brand compact />
                 </button>
-                <button type="button" className="btn btn-ghost" onClick={() => navigate('/login')}>
-                    Iniciar sesión
-                </button>
+                <AccesoPanel />
             </header>
 
             <section className="catalogo-hero">

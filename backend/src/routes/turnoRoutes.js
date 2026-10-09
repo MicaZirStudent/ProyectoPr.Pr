@@ -17,8 +17,9 @@ router.get('/horarios/:idPublicacion', obtenerHorariosDisponibles);
 // El cliente envía el formulario (nombre, email, WhatsApp, fecha/hora, propiedad)
 router.post('/solicitar', crearTurno);
 
-router.get('/mios', verificarToken, verificarRol('Agente', 'Administrador'), listarMisTurnos);
-router.put('/:id', verificarToken, verificarRol('Agente', 'Administrador'), actualizarTurno);
+// Solo el agente gestiona los turnos de sus propiedades (el administrador no carga ni edita turnos)
+router.get('/mios', verificarToken, verificarRol('Agente'), listarMisTurnos);
+router.put('/:id', verificarToken, verificarRol('Agente'), actualizarTurno);
 
 // Exportamos el router para usarlo en index.js
 module.exports = router;

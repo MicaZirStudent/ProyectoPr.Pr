@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { configurarHttp } from './utils/http';
+
+// Interceptores de axios para renovar la sesión y detectar cuando vence
+configurarHttp();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

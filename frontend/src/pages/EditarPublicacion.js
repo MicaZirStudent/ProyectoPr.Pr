@@ -1,247 +1,136 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AgentLayout from '../components/AgentLayout';
-import PublicacionMediaFields from '../components/PublicacionMediaFields';
-import { withPublicacionMedia, persistPublicacionMedia, fotosADataUrls } from '../utils/publicacionMedia';
+import FormularioPublicacion, { FORMULARIO_VACIO, validarAdjuntos } from '../components/FormularioPublicacion';
+import {
+    documentosAPayload,
+    documentosDesdeBackend,
+    fotosADataUrls,
+    fotosDesdeImagenes
+} from '../utils/publicacionMedia';
+import { API_URL } from '../utils/http';
+import { ROLES, encabezadoAuth, esRol } from '../utils/sesion';
 import './CrearPublicacion.css';
 
 const EditarPublicacion = () => {
     const { id } = useParams();
-    const [form, setForm] = useState({
-        titulo: '',
-        descripcion: '',
-        tipoOperacion: 'venta',
-        tipoPropiedad: '',
-        precio: '',
-        moneda: 'USD',
-        direccion: '',
-        superficie: '',
-        ambientes: '',
-        documentos: [],
-        fotos: []
-    });
+    const navigate = useNavigate();
+    const esAdmin = esRol(ROLES.ADMIN);
+    const [form, setForm] = useState(FORMULARIO_VACIO);
+    const [estado, setEstado] = useState('');
     const [error, setError] = useState('');
     const [exito, setExito] = useState('');
     const [guardando, setGuardando] = useState(false);
     const [cargando, setCargando] = useState(true);
-    const navigate = useNavigate();
+
+    const volver = () => navigate('/mis-publicaciones');
 
     useEffect(() => {
-        obtenerPublicacion();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const obtenerPublicacion = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const respuesta = await axios.get(`http://localhost:3001/api/publicaciones/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const pub = withPublicacionMedia(respuesta.data);
-            setForm({
-                titulo: pub.titulo,
-                descripcion: pub.descripcion || '',
-                tipoOperacion: (pub.tipo_operacion || 'venta').toLowerCase(),
-                tipoPropiedad: pub.tipo_propiedad ? pub.tipo_propiedad.toLowerCase() : '',
-                precio: pub.precio ?? '',
-                moneda: ['USD', 'ARS'].includes(pub.moneda) ? pub.moneda : 'USD',
-                direccion: pub.direccion,
-                superficie: pub.superficie ?? '',
-                ambientes: pub.ambientes ?? '',
-                documentos: pub.documentos || [],
-                fotos: pub.fotos || []
-            });
-            setCargando(false);
-        } catch (error) {
-            if (error.response?.status === 401) navigate('/login');
-            if (error.response?.status === 404) navigate('/mis-publicaciones');
-            setCargando(false);
-        }
-    };
+        const cargar = async () => {
+            try {
+                const { data: pub } = await axios.get(`${API_URL}/api/publicaciones/${id}`, encabezadoAuth());
+                setEstado(pub.estado);
+                setForm({
+                    titulo: pub.titulo,
+                    descripcion: pub.descripcion || '',
+                    tipoOperacion: (pub.tipo_operacion || 'venta').toLowerCase(),
+                    tipoPropiedad: pub.tipo_propiedad ? pub.tipo_propiedad.toLowerCase() : '',
+                    precio: pub.precio ?? '',
+                    moneda: ['USD', 'ARS'].includes(pub.moneda) ? pub.moneda : 'USD',
+                    direccion: pub.direccion,
+                    superficie: pub.superficie ?? '',
+                    ambientes: pub.ambientes ?? '',
+                    documentos: documentosDesdeBackend(pub.documentos),
+                    fotos: fotosDesdeImagenes(pub.imagenes)
+                });
+            } catch (err) {
+                if (err.response?.status === 404) {
+                    navigate('/mis-publicaciones', { replace: true });
+                    return;
+                }
+                setError(err.response?.data?.mensaje || 'No se pudo cargar la publicación');
+            } finally {
+                setCargando(false);
+            }
+        };
+        cargar();
+    }, [id, navigate]);
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleMediaChange = (campo, valor) => {
-        setForm({ ...form, [campo]: valor });
+        setForm((prev) => ({ ...prev, [campo]: valor }));
+        setError('');
     };
 
     const handleGuardar = async (e) => {
         e.preventDefault();
         setError('');
         setExito('');
-        setGuardando(true);
 
+        const errorAdjuntos = validarAdjuntos(form);
+        if (errorAdjuntos) {
+            setError(errorAdjuntos);
+            return;
+        }
+
+        setGuardando(true);
         try {
-            const token = localStorage.getItem('token');
-            const { documentos, fotos, ...payload } = form;
-            const imagenes = await fotosADataUrls(fotos);
-            await axios.put(`http://localhost:3001/api/publicaciones/${id}`, { ...payload, imagenes }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            await persistPublicacionMedia(id, documentos, fotos);
+            const { documentos, fotos, ...datos } = form;
+            const payload = {
+                ...datos,
+                imagenes: await fotosADataUrls(fotos),
+                documentos: await documentosAPayload(documentos)
+            };
+            await axios.put(`${API_URL}/api/publicaciones/${id}`, payload, encabezadoAuth());
             setExito('Publicación actualizada correctamente');
-            setTimeout(() => {
-                navigate('/mis-publicaciones');
-            }, 1500);
-        } catch (error) {
-            if (error.response?.status === 401) {
-                navigate('/login');
-                return;
-            }
-            if (error.response?.status === 403) {
-                setError('No se puede editar una publicación en este estado');
-            } else if (error.response?.status === 413) {
-                setError('Las fotos son demasiado pesadas. Sacá alguna e intentá de nuevo.');
+            setTimeout(volver, 1500);
+        } catch (err) {
+            if (err.response?.status === 413) {
+                setError('Los archivos son demasiado pesados. Quitá alguno e intentá de nuevo.');
             } else {
-                setError(error.response?.data?.mensaje || 'Complete todos los campos obligatorios');
+                setError(err.response?.data?.mensaje || 'No se pudo actualizar la publicación');
             }
         } finally {
             setGuardando(false);
         }
     };
 
+    const encabezado = {
+        title: 'Editar publicación',
+        subtitle: esAdmin && estado ? `Estado actual: ${estado}` : 'Modificá los datos de la propiedad',
+        actions: (
+            <button type="button" className="btn btn-outline btn-back" onClick={volver}>
+                Volver
+            </button>
+        )
+    };
+
     if (cargando) {
         return (
-            <AgentLayout title="Editar publicación">
+            <AgentLayout {...encabezado}>
                 <p className="empty-state">Cargando...</p>
             </AgentLayout>
         );
     }
 
     return (
-        <AgentLayout
-            title="Editar publicación"
-            subtitle="Modificá los datos de la propiedad"
-            actions={
-                <button type="button" className="btn btn-outline btn-back" onClick={() => navigate('/mis-publicaciones')}>
-                    Volver
-                </button>
-            }
-        >
-            <form onSubmit={handleGuardar} className="crear-form">
-                {error && <p className="alert alert-error">{error}</p>}
-                {exito && <p className="alert alert-ok">{exito}</p>}
-
-                <div className="form-card">
-                    <h2 className="form-section-title">Datos de la propiedad</h2>
-
-                    <div className="field">
-                        <label>Título *</label>
-                        <input
-                            type="text"
-                            name="titulo"
-                            value={form.titulo}
-                            onChange={handleChange}
-                            placeholder="Ej: Casa con jardín en Fisherton"
-                            required
-                        />
-                    </div>
-
-                    <div className="field">
-                        <label>Descripción</label>
-                        <textarea
-                            name="descripcion"
-                            value={form.descripcion}
-                            onChange={handleChange}
-                            placeholder="Describí la propiedad..."
-                            rows={4}
-                        />
-                    </div>
-
-                    <div className="field-row">
-                        <div className="field">
-                            <label>Tipo de operación *</label>
-                            <select name="tipoOperacion" value={form.tipoOperacion} onChange={handleChange}>
-                                <option value="venta">Venta</option>
-                                <option value="alquiler">Alquiler</option>
-                            </select>
-                        </div>
-                        <div className="field">
-                            <label>Tipo de propiedad</label>
-                            <select name="tipoPropiedad" value={form.tipoPropiedad} onChange={handleChange}>
-                                <option value="">Sin especificar</option>
-                                <option value="casa">Casa</option>
-                                <option value="departamento">Departamento</option>
-                                <option value="local">Local</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="field-row">
-                        <div className="field">
-                            <label>Precio *</label>
-                            <input
-                                type="number"
-                                name="precio"
-                                value={form.precio}
-                                onChange={handleChange}
-                                placeholder="Ej: 150000"
-                                required
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Moneda *</label>
-                            <select name="moneda" value={form.moneda} onChange={handleChange}>
-                                <option value="USD">USD</option>
-                                <option value="ARS">ARS</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="field">
-                        <label>Dirección *</label>
-                        <input
-                            type="text"
-                            name="direccion"
-                            value={form.direccion}
-                            onChange={handleChange}
-                            placeholder="Ej: Av. Vélez Sársfield 1234, Rosario"
-                            required
-                        />
-                    </div>
-
-                    <div className="field-row">
-                        <div className="field">
-                            <label>Superficie (m²)</label>
-                            <input
-                                type="number"
-                                name="superficie"
-                                value={form.superficie}
-                                onChange={handleChange}
-                                placeholder="Ej: 200"
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Ambientes</label>
-                            <input
-                                type="number"
-                                name="ambientes"
-                                value={form.ambientes}
-                                onChange={handleChange}
-                                placeholder="Ej: 4"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <PublicacionMediaFields
-                    documentos={form.documentos}
-                    fotos={form.fotos}
-                    onChange={handleMediaChange}
-                />
-
-                <div className="form-actions">
-                    <button type="button" className="btn btn-outline" onClick={() => navigate('/mis-publicaciones')}>
-                        Cancelar
-                    </button>
-                    <button type="submit" className="btn btn-primary" disabled={guardando}>
-                        {guardando ? 'Guardando...' : 'Guardar'}
-                    </button>
-                </div>
-            </form>
+        <AgentLayout {...encabezado}>
+            <FormularioPublicacion
+                form={form}
+                onChange={handleChange}
+                onMediaChange={handleMediaChange}
+                onSubmit={handleGuardar}
+                onCancelar={volver}
+                error={error}
+                exito={exito}
+                aviso={esAdmin ? 'Como administrador, los cambios se guardan sin modificar el estado de la publicación.' : ''}
+                guardando={guardando}
+                textoGuardar="Guardar cambios"
+            />
         </AgentLayout>
     );
 };
