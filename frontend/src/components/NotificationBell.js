@@ -4,6 +4,7 @@ import axios from 'axios';
 import './NotificationBell.css';
 import { API_URL } from '../utils/http';
 import { encabezadoAuth, haySesion } from '../utils/sesion';
+import { createPortal } from 'react-dom';
 
 // Las notificaciones viejas no tienen "tipo": lo deducimos del mensaje
 const tipoDe = (item) => {
@@ -259,17 +260,18 @@ const NotificationBell = () => {
                 </div>
             )}
 
-            {avisoExtra && !avisoLogin && (
+                        {avisoExtra && !avisoLogin && createPortal(
                 <div className="notif-toast" role="status">
                     <strong>Atención</strong>
                     <span>{avisoExtra}</span>
                     <button type="button" className="notif-toast-cerrar" onClick={() => setAvisoExtra('')}>
                         Cerrar
                     </button>
-                </div>
+                </div>,
+                document.body
             )}
 
-            {avisoLogin && (
+                        {avisoLogin && createPortal(
                 <div className="notif-modal-fondo" role="dialog" aria-labelledby="notif-modal-titulo">
                     <div className="notif-modal modal-panel">
                         <h2 id="notif-modal-titulo">Tenés avisos nuevos</h2>
@@ -293,7 +295,8 @@ const NotificationBell = () => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
